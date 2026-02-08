@@ -176,59 +176,6 @@ class TwilioCallManager
         $this->callRepository->save($call);
     }
 
-    public function fetchPrices(int $retries): void
-    {
-        $entities = $this->callRepository->findEntitiesWithoutPrice($retries);
-
-        foreach ($entities as $entity) {
-            $entity->setRetry($entity->getRetry() + 1);
-
-            try {
-                /** @phpstan-ignore method.notFound (Twilio SDK magic method) */
-                $call = $this->getClient()->calls($entity->getSid())->fetch();
-            } catch (\Exception $e) {
-                $this->logger->error('Unable to fetch Twilio call', [
-                    'id' => $entity->getId(),
-                    'sid' => $entity->getSid(),
-                    'exception' => $e->getMessage(),
-                ]);
-
-                $this->callRepository->save($entity);
-
-                continue;
-            }
-
-            if ($call->status) {
-                $entity->setStatus($call->status);
-            }
-
-            if ($call->startTime) {
-                $entity->setStartedAt($call->startTime);
-            }
-
-            if ($call->endTime) {
-                $entity->setEndedAt($call->endTime);
-            }
-
-            if ($call->duration) {
-                $entity->setDuration($call->duration);
-            }
-
-            if ($call->price) {
-                $entity->setPrice($call->price);
-                $entity->setUnit($call->priceUnit);
-                $this->eventDispatcher->dispatch(new TwilioCallEvent($entity), TwilioEvent::CALL_PRICE_UPDATED);
-            }
-
-            $this->callRepository->save($entity);
-        }
-    }
-
-    public function iterate(callable $callback): void
-    {
-        $this->callRepository->iterate($callback);
-    }
-
     private function storeMessage(TwilioCallEvent $event, TwilioCall $call): void
     {
         $response = $event->getResponse();

@@ -38,15 +38,6 @@ abstract class AbstractTwilioEntity
     #[ORM\Column(length: 20, nullable: true)]
     protected ?string $status = null;
 
-    #[ORM\Column(nullable: true)]
-    protected ?string $price = null;
-
-    #[ORM\Column(nullable: true)]
-    protected ?string $unit = null;
-
-    #[ORM\Column]
-    protected int $retry = 0;
-
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     protected ?string $context = null;
 
@@ -144,42 +135,6 @@ abstract class AbstractTwilioEntity
     public function setStatus(?string $status): static
     {
         $this->status = $status;
-
-        return $this;
-    }
-
-    public function getPrice(): ?string
-    {
-        return $this->price;
-    }
-
-    public function setPrice(?string $price): static
-    {
-        $this->price = $price;
-
-        return $this;
-    }
-
-    public function getUnit(): ?string
-    {
-        return $this->unit;
-    }
-
-    public function setUnit(?string $unit): static
-    {
-        $this->unit = $unit;
-
-        return $this;
-    }
-
-    public function getRetry(): int
-    {
-        return $this->retry;
-    }
-
-    public function setRetry(int $retry): static
-    {
-        $this->retry = $retry;
 
         return $this;
     }

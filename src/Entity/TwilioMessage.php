@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table]
 #[ORM\UniqueConstraint(name: 'uuid_idx', columns: ['uuid'])]
 #[ORM\Index(name: 'sid_idx', columns: ['sid'])]
-#[ORM\Index(name: 'price_idx', columns: ['price'])]
 #[ORM\HasLifecycleCallbacks]
 class TwilioMessage extends AbstractTwilioEntity
 {

@@ -129,47 +129,6 @@ class TwilioMessageManager
         return $entity;
     }
 
-    public function fetchPrices(int $retries): void
-    {
-        $entities = $this->messageRepository->findEntitiesWithoutPrice($retries);
-
-        foreach ($entities as $entity) {
-            try {
-                /** @phpstan-ignore method.notFound (Twilio SDK magic method) */
-                $message = $this->getClient()->messages($entity->getSid())->fetch();
-            } catch (\Exception $e) {
-                $this->logger->error('Unable to fetch Twilio message', [
-                    'id' => $entity->getId(),
-                    'sid' => $entity->getSid(),
-                    'exception' => $e->getMessage(),
-                ]);
-
-                $this->messageRepository->save($entity);
-
-                continue;
-            }
-
-            if ($message->status) {
-                $entity->setStatus($message->status);
-            }
-
-            if ($message->price) {
-                $entity->setPrice($message->price);
-                $entity->setUnit($message->priceUnit);
-                $this->eventDispatcher->dispatch(new TwilioMessageEvent($entity), TwilioEvent::MESSAGE_PRICE_UPDATED);
-            } else {
-                $entity->setRetry($entity->getRetry() + 1);
-            }
-
-            $this->messageRepository->save($entity);
-        }
-    }
-
-    public function iterate(callable $callback): void
-    {
-        $this->messageRepository->iterate($callback);
-    }
-
     private function getClient(): Client
     {
         return $this->twilio->getClient();
