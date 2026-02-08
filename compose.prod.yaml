@@ -42,6 +42,40 @@ services:
     build:
       context: .
       dockerfile: docker/php/Dockerfile.prod
+      target: base
+    deploy:
+      restart_policy:
+        condition: any
+
+  worker1:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile.prod
+      target: worker
+    depends_on:
+      - mysql
+    deploy:
+      restart_policy:
+        condition: any
+
+  worker2:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile.prod
+      target: worker
+    depends_on:
+      - mysql
+    deploy:
+      restart_policy:
+        condition: any
+
+  worker3:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile.prod
+      target: worker
+    depends_on:
+      - mysql
     deploy:
       restart_policy:
         condition: any

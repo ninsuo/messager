@@ -39,8 +39,45 @@ services:
     build:
       context: .
       dockerfile: docker/php/Dockerfile
+      target: base
     user: "1000:1000"
     ports:
       - "9010:9000"
     volumes:
       - .:/var/www
+
+  worker1:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      target: worker
+    user: "1000:1000"
+    volumes:
+      - .:/var/www
+    depends_on:
+      - mysql
+    restart: unless-stopped
+
+  worker2:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      target: worker
+    user: "1000:1000"
+    volumes:
+      - .:/var/www
+    depends_on:
+      - mysql
+    restart: unless-stopped
+
+  worker3:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      target: worker
+    user: "1000:1000"
+    volumes:
+      - .:/var/www
+    depends_on:
+      - mysql
+    restart: unless-stopped

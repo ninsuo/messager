@@ -12,6 +12,11 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\HasLifecycleCallbacks]
 class Message
 {
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_SENT = 'sent';
+    public const STATUS_DELIVERED = 'delivered';
+    public const STATUS_FAILED = 'failed';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -27,6 +32,9 @@ class Message
     #[ORM\ManyToOne(targetEntity: Contact::class)]
     #[ORM\JoinColumn(nullable: false)]
     private ?Contact $contact = null;
+
+    #[ORM\Column(length: 20)]
+    private ?string $status = self::STATUS_PENDING; // @phpstan-ignore property.unusedType
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $error = null;
@@ -71,6 +79,18 @@ class Message
     public function setContact(Contact $contact): static
     {
         $this->contact = $contact;
+
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): static
+    {
+        $this->status = $status;
 
         return $this;
     }

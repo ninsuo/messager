@@ -51,3 +51,7 @@ RUN composer install --optimize-autoloader --no-dev --no-scripts \
     && bin/console cache:warmup
 
 ENTRYPOINT ["php-fpm"]
+
+FROM base AS worker
+
+ENTRYPOINT ["php", "bin/console", "messenger:consume", "async", "-vv", "--time-limit=3600", "--sleep=0.5"]

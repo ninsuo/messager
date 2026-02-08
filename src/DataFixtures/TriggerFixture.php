@@ -42,6 +42,7 @@ class TriggerFixture extends Fixture implements DependentFixtureInterface
             $message = new Message();
             $message->setUuid(Uuid::v4()->toRfc4122());
             $message->setContact($contact);
+            $message->setStatus(Message::STATUS_SENT);
             $smsTrigger->addMessage($message);
         }
 
@@ -61,6 +62,7 @@ class TriggerFixture extends Fixture implements DependentFixtureInterface
             $message = new Message();
             $message->setUuid(Uuid::v4()->toRfc4122());
             $message->setContact($contact);
+            $message->setStatus(Message::STATUS_SENT);
             $callTrigger->addMessage($message);
         }
 
@@ -80,17 +82,20 @@ class TriggerFixture extends Fixture implements DependentFixtureInterface
         $msgOk = new Message();
         $msgOk->setUuid(Uuid::v4()->toRfc4122());
         $msgOk->setContact($contact3);
+        $msgOk->setStatus(Message::STATUS_SENT);
         $errorTrigger->addMessage($msgOk);
 
         $msgErr1 = new Message();
         $msgErr1->setUuid(Uuid::v4()->toRfc4122());
         $msgErr1->setContact($contact4);
+        $msgErr1->setStatus(Message::STATUS_FAILED);
         $msgErr1->setError('Undeliverable: invalid number');
         $errorTrigger->addMessage($msgErr1);
 
         $msgErr2 = new Message();
         $msgErr2->setUuid(Uuid::v4()->toRfc4122());
         $msgErr2->setContact($contact5);
+        $msgErr2->setStatus(Message::STATUS_FAILED);
         $msgErr2->setError('Carrier rejected');
         $errorTrigger->addMessage($msgErr2);
 

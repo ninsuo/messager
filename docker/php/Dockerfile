@@ -1,4 +1,4 @@
-FROM php:8.4-fpm-alpine
+FROM php:8.4-fpm-alpine AS base
 
 RUN apk --update --no-cache add git g++ gcc libxslt-dev libmcrypt-dev icu-dev vim wget unzip \
       freetype libpng libjpeg-turbo freetype-dev libpng-dev libjpeg-turbo-dev oniguruma-dev bash \
@@ -46,3 +46,7 @@ USER 1000
 WORKDIR /var/www
 
 ENTRYPOINT ["php-fpm"]
+
+FROM base AS worker
+
+ENTRYPOINT ["php", "bin/console", "messenger:consume", "async", "-vv", "--time-limit=3600", "--sleep=0.5"]
