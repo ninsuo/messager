@@ -7,7 +7,8 @@
       "Bash(php bin/console doctrine:schema:validate:*)",
       "Bash(vendor/bin/phpstan analyse:*)",
       "Bash(docker compose config:*)",
-      "Bash(docker compose:*)"
+      "Bash(docker compose:*)",
+      "Bash(APP_ENV=prod php bin/console lint:container:*)"
     ]
   }
 }

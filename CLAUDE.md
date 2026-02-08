@@ -31,6 +31,9 @@ src/
 ├── Event/            # Symfony event dispatcher events
 ├── Http/             # Custom HTTP response classes
 ├── Manager/          # Business logic (Twilio managers)
+├── Provider/         # SMS/Call provider interfaces + implementations
+│   ├── SMS/          # SmsProvider interface, TwilioSmsProvider, FakeSmsProvider
+│   └── Call/         # CallProvider interface, TwilioCallProvider, FakeCallProvider
 ├── Repository/       # Doctrine repositories
 └── Service/          # Service layer (TwilioClient)
 ```
@@ -45,6 +48,15 @@ src/
 - **Return types:** Always use `static` (not `self`) for fluent entity setters
 - **Naming:** All Twilio-related classes are prefixed with `Twilio` to avoid name collisions. Abstract base classes use the `Abstract` prefix (e.g. `AbstractTwilioController`, `AbstractTwilioEntity`)
 - **Symfony Request:** `$request->query->get()` or `$request->request->get()` — never `$request->get()` (removed in Symfony 8)
+
+## Provider pattern
+
+SMS and Call sending is abstracted behind interfaces (`SmsProvider`, `CallProvider`). The implementation is swapped per environment via `when@dev` in `config/services.yaml`:
+
+- **prod:** `TwilioSmsProvider` / `TwilioCallProvider` — real Twilio API calls
+- **dev:** `FakeSmsProvider` / `FakeCallProvider` — stores to `FakeSms` / `FakeCall` entities, no external calls
+
+Type-hint the interface (e.g. `SmsProvider $sms`) to get the right implementation automatically.
 
 ## Twilio integration
 
