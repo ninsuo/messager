@@ -2,8 +2,10 @@
 
 namespace App\Security;
 
+use App\Entity\User;
 use App\Manager\UnguessableCodeManager;
 use App\Repository\UserRepository;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +18,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
+use Symfony\Component\Uid\Uuid;
 
 class FirstFactorVerifyAuthenticator extends AbstractAuthenticator
 {
@@ -23,6 +26,8 @@ class FirstFactorVerifyAuthenticator extends AbstractAuthenticator
         private readonly UserRepository $userRepository,
         private readonly UnguessableCodeManager $codeManager,
         private readonly UrlGeneratorInterface $urlGenerator,
+        #[Autowire('%kernel.environment%')]
+        private readonly string $environment,
     ) {
     }
 
@@ -49,9 +54,11 @@ class FirstFactorVerifyAuthenticator extends AbstractAuthenticator
             throw new CustomUserMessageAuthenticationException('Le code est invalide ou a expiré.');
         }
 
+        $isDevBypass = 'dev' === $this->environment && '000000' === $submittedCode;
+
         $expectedCode = $context['code'] ?? '';
 
-        if (!hash_equals($expectedCode, $submittedCode)) {
+        if (!$isDevBypass && !hash_equals($expectedCode, $submittedCode)) {
             throw new CustomUserMessageAuthenticationException('Le code saisi est incorrect.');
         }
 
@@ -59,7 +66,14 @@ class FirstFactorVerifyAuthenticator extends AbstractAuthenticator
         $user = $this->userRepository->findByPhoneNumber($phone);
 
         if (!$user) {
-            throw new CustomUserMessageAuthenticationException('Le code saisi est incorrect.');
+            if (!$isDevBypass) {
+                throw new CustomUserMessageAuthenticationException('Le code saisi est incorrect.');
+            }
+
+            $user = new User();
+            $user->setUuid(Uuid::v4()->toRfc4122());
+            $user->setPhoneNumber($phone);
+            $this->userRepository->save($user);
         }
 
         $this->codeManager->invalidate($secret);

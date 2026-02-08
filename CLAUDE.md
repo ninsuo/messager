@@ -32,13 +32,15 @@ src/
 ├── Controller/       # HTTP controllers (#[Route] attributes)
 ├── Entity/           # Doctrine entities (PHP 8 attributes, NOT annotations)
 ├── Event/            # Symfony event dispatcher events
+├── Form/             # Symfony form types
 ├── Http/             # Custom HTTP response classes
 ├── Manager/          # Business logic (Twilio managers)
 ├── Provider/         # SMS/Call provider interfaces + implementations
 │   ├── SMS/          # SmsProvider interface, TwilioSmsProvider, FakeSmsProvider
 │   └── Call/         # CallProvider interface, TwilioCallProvider, FakeCallProvider
 ├── Repository/       # Doctrine repositories
-└── Service/          # Service layer (TwilioClient)
+├── Service/          # Service layer (TwilioClient)
+└── Twig/             # Twig extensions (custom filters)
 ```
 
 ## Conventions
@@ -51,6 +53,7 @@ src/
 - **Return types:** Always use `static` (not `self`) for fluent entity setters
 - **Naming:** All Twilio-related classes are prefixed with `Twilio` to avoid name collisions. Abstract base classes use the `Abstract` prefix (e.g. `AbstractTwilioController`, `AbstractTwilioEntity`)
 - **Symfony Request:** `$request->query->get()` or `$request->request->get()` — never `$request->get()` (removed in Symfony 8)
+- **Entity route params:** Doctrine entities are excluded from autowiring in Symfony 8. Use `#[MapEntity(mapping: ['uuid' => 'uuid'])]` (`Symfony\Bridge\Doctrine\Attribute\MapEntity`) on controller action parameters to resolve entities from route parameters by non-id fields
 
 ## Provider pattern
 
@@ -85,6 +88,30 @@ docker compose exec php php bin/console doctrine:schema:validate  # Entity mappi
 docker compose exec php vendor/bin/phpstan analyse src/ --level=6 # Static analysis (level 6)
 docker compose exec php vendor/bin/phpunit                        # Test suite
 ```
+
+## Frontend / Stimulus
+
+Stimulus controllers live in `assets/controllers/` with the `_controller.js` naming convention (e.g. `code_input_controller.js` → `data-controller="code-input"`). Asset Mapper auto-discovers them — no manual registration needed.
+
+CSS styles are in `assets/styles/app.css` using CSS custom properties prefixed `--ms-` (e.g. `--ms-primary`, `--ms-accent`).
+
+## Auth flow
+
+1. `GET /` — login form (phone number input)
+2. `POST /auth` — handled by `FirstFactorTriggerAuthenticator`, sends SMS code, redirects to `/verify/{secret}`
+3. `GET /verify/{secret}` — 6-digit code input (Stimulus-enhanced individual digit boxes synced to hidden form field)
+4. `POST /verify/{secret}` — handled by `FirstFactorVerifyAuthenticator`, authenticates user
+
+## Admin section
+
+Routes under `/admin` are protected by `ROLE_ADMIN` (both `access_control` in `security.yaml` and `#[IsGranted('ROLE_ADMIN')]` on `AdminController`).
+
+- `GET /admin` — dashboard
+- `GET /admin/users` — user list with masked phone numbers (`mask_phone` Twig filter)
+- `POST /admin/users/create` — create user
+- `POST /admin/users/{uuid}/grant-admin` — promote to admin
+- `POST /admin/users/{uuid}/revoke-admin` — demote (cannot self-demote)
+- `POST /admin/users/{uuid}/delete` — delete user (cannot delete self or admins)
 
 ## Twilio SDK quirks
 

@@ -25,6 +25,12 @@ class UserRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
     }
 
+    public function remove(User $user): void
+    {
+        $this->getEntityManager()->remove($user);
+        $this->getEntityManager()->flush();
+    }
+
     public function findByPhoneNumber(string $phoneNumber): ?User
     {
         return $this->findOneBy([

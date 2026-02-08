@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Messager - Utilisateurs{% endblock %}
+
+{% block body %}
+    <div class="admin-wrapper">
+        <div class="container">
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ path('admin') }}" class="btn btn-outline-secondary btn-sm me-3">&larr; Retour</a>
+                <h1 class="admin-title mb-0">Utilisateurs</h1>
+            </div>
+
+            <div class="admin-create-form mb-4">
+                {{ form_start(form) }}
+                    <div class="d-flex gap-2">
+                        <div class="flex-grow-1">
+                            {{ form_widget(form.phone) }}
+                        </div>
+                        <button type="submit" class="btn btn-ms-primary">Créer</button>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success">{{ message }}</div>
+            {% endfor %}
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger">{{ message }}</div>
+            {% endfor %}
+
+            <div class="table-responsive">
+                <table class="table admin-table">
+                    <thead>
+                        <tr>
+                            <th>Téléphone</th>
+                            <th>Rôle</th>
+                            <th>Créé le</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            <tr>
+                                <td>{{ user.phoneNumber|mask_phone }}</td>
+                                <td>
+                                    {% if user.admin %}
+                                        <span class="badge bg-primary">Admin</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Utilisateur</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ user.createdAt|date('d/m/Y H:i') }}</td>
+                                <td class="text-end">
+                                    {% if user.uuid != app.user.userIdentifier %}
+                                        {% if user.admin %}
+                                            <form method="post" action="{{ path('admin_users_revoke_admin', {uuid: user.uuid}) }}" class="d-inline">
+                                                <button type="submit" class="btn btn-warning btn-sm">Retirer admin</button>
+                                            </form>
+                                        {% else %}
+                                            <form method="post" action="{{ path('admin_users_grant_admin', {uuid: user.uuid}) }}" class="d-inline">
+                                                <button type="submit" class="btn btn-info btn-sm">Promouvoir admin</button>
+                                            </form>
+                                            <form method="post" action="{{ path('admin_users_delete', {uuid: user.uuid}) }}" class="d-inline">
+                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer cet utilisateur ?')">Supprimer</button>
+                                            </form>
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

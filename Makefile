@@ -1,5 +1,11 @@
 .PHONY: test
 
+init-db:
+	docker compose exec php php bin/console doctrine:database:drop -e dev -f --if-exists -n
+	docker compose exec php php bin/console doctrine:database:create -e dev -n
+	docker compose exec php php bin/console doctrine:migrations:migrate -e dev -n
+	docker compose exec php php bin/console doctrine:fixtures:load -e dev -n
+
 test:
 	docker compose exec php php bin/console doctrine:database:drop -e test -f --if-exists -n
 	docker compose exec php php bin/console doctrine:database:create -e test -n

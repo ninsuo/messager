@@ -14,11 +14,19 @@
     </head>
     <body>
         <nav class="navbar navbar-ms">
-            <div class="container">
+            <div class="container d-flex justify-content-between align-items-center">
                 <a class="navbar-brand" href="{{ path('home') }}">
                     <img src="{{ asset('favicon.svg') }}" alt="" width="32" height="32">
                     messager
                 </a>
+                {% if app.user %}
+                    <div class="navbar-ms-actions">
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a href="{{ path('admin') }}" class="btn btn-outline-light btn-sm">Admin</a>
+                        {% endif %}
+                        <a href="{{ path('logout') }}" class="btn btn-outline-light btn-sm">Déconnexion</a>
+                    </div>
+                {% endif %}
             </div>
         </nav>
 

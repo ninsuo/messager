@@ -17,9 +17,30 @@
             {% endif %}
 
             {{ form_start(form) }}
-                <div class="mb-3">
-                    <label for="{{ form.code.vars.id }}" class="form-label visually-hidden">Code de vérification</label>
-                    {{ form_widget(form.code) }}
+                <div class="mb-3" data-controller="code-input">
+                    <label class="form-label visually-hidden">Code de vérification</label>
+
+                    <div class="code-digits">
+                        {% for i in 0..5 %}
+                            <input type="text"
+                                   inputmode="numeric"
+                                   pattern="\d"
+                                   maxlength="1"
+                                   class="code-digit"
+                                   autocomplete="off"
+                                   data-code-input-target="digit"
+                                   data-action="input->code-input#onInput keydown->code-input#onKeydown paste->code-input#onPaste focus->code-input#onFocus"
+                                   {% if i == 0 %}autofocus{% endif %}
+                                   aria-label="Chiffre {{ i + 1 }}">
+                            {% if i == 2 %}
+                                <span class="code-separator"></span>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <div class="d-none">
+                        {{ form_widget(form.code, {attr: {'data-code-input-target': 'hidden'}}) }}
+                    </div>
                 </div>
 
                 <div class="mb-3 form-check">

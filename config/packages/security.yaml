@@ -24,6 +24,9 @@ security:
             logout:
                 path: logout
 
+    access_control:
+        - { path: ^/admin, roles: ROLE_ADMIN }
+
 when@test:
     security:
         password_hashers:
