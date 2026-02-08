@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Messager - Vérification{% endblock %}
+
+{% block body %}
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="logo-section">
+                <img src="{{ asset('logo.svg') }}" alt="Messager">
+            </div>
+
+            <h1>Vérification</h1>
+            <p class="text-center text-muted mb-4">Entrez le code reçu par SMS</p>
+
+            {% if error %}
+                <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+
+            {{ form_start(form) }}
+                <div class="mb-3">
+                    <label for="{{ form.code.vars.id }}" class="form-label visually-hidden">Code de vérification</label>
+                    {{ form_widget(form.code) }}
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" name="_remember_me" id="remember_me" value="1">
+                    <label class="form-check-label" for="remember_me">Rester connecté</label>
+                </div>
+
+                <button type="submit" class="btn btn-ms-primary w-100">
+                    Vérifier
+                </button>
+            {{ form_end(form) }}
+
+            <div class="text-center mt-3">
+                <a href="{{ path('home') }}">Retour</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

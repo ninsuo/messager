@@ -2,7 +2,10 @@
 
 namespace App\Tests\Controller;
 
+use App\Entity\User;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Uid\Uuid;
 
 class HomeControllerTest extends WebTestCase
 {
@@ -17,7 +20,7 @@ class HomeControllerTest extends WebTestCase
     public function testTitle(): void
     {
         $client = static::createClient();
-        $crawler = $client->request('GET', '/');
+        $client->request('GET', '/');
 
         $this->assertSelectorTextContains('title', 'Messager - Connexion');
     }
@@ -65,7 +68,7 @@ class HomeControllerTest extends WebTestCase
     public function testLoginHeading(): void
     {
         $client = static::createClient();
-        $crawler = $client->request('GET', '/');
+        $client->request('GET', '/');
 
         $this->assertSelectorTextContains('h1', 'Connexion');
     }
@@ -75,10 +78,9 @@ class HomeControllerTest extends WebTestCase
         $client = static::createClient();
         $crawler = $client->request('GET', '/');
 
-        $input = $crawler->filter('input#phone');
+        $input = $crawler->filter('input[type="tel"]');
         $this->assertCount(1, $input);
-        $this->assertSame('tel', $input->attr('type'));
-        $this->assertSame('phone', $input->attr('name'));
+        $this->assertSame('phone_form[phone]', $input->attr('name'));
         $this->assertNotNull($input->attr('required'));
     }
 
@@ -100,7 +102,7 @@ class HomeControllerTest extends WebTestCase
         $form = $crawler->filter('form');
         $this->assertCount(1, $form);
         $this->assertSame('post', $form->attr('method'));
-        $this->assertSame('/', $form->attr('action'));
+        $this->assertSame('/auth', $form->attr('action'));
     }
 
     public function testFooter(): void
@@ -112,5 +114,60 @@ class HomeControllerTest extends WebTestCase
         $this->assertCount(1, $footer);
         $this->assertStringContainsString('Messager', $footer->text());
         $this->assertStringContainsString(date('Y'), $footer->text());
+    }
+
+    public function testAuthenticatedShowsHelloWorld(): void
+    {
+        $client = static::createClient();
+
+        $user = new User();
+        $user->setUuid(Uuid::v4()->toRfc4122());
+        $user->setPhoneNumber('+33600000099');
+
+        $userRepository = self::getContainer()->get(UserRepository::class);
+        $userRepository->save($user);
+
+        $client->loginUser($user);
+        $client->request('GET', '/');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('h1', 'Hello World');
+        $this->assertSelectorTextContains('title', 'Messager');
+    }
+
+    public function testAuthenticatedShowsLogoutLink(): void
+    {
+        $client = static::createClient();
+
+        $user = new User();
+        $user->setUuid(Uuid::v4()->toRfc4122());
+        $user->setPhoneNumber('+33600000099');
+
+        $userRepository = self::getContainer()->get(UserRepository::class);
+        $userRepository->save($user);
+
+        $client->loginUser($user);
+        $crawler = $client->request('GET', '/');
+
+        $logoutLink = $crawler->filter('a[href="/logout"]');
+        $this->assertCount(1, $logoutLink);
+        $this->assertStringContainsString('Déconnexion', $logoutLink->text());
+    }
+
+    public function testAuthenticatedDoesNotShowPhoneForm(): void
+    {
+        $client = static::createClient();
+
+        $user = new User();
+        $user->setUuid(Uuid::v4()->toRfc4122());
+        $user->setPhoneNumber('+33600000099');
+
+        $userRepository = self::getContainer()->get(UserRepository::class);
+        $userRepository->save($user);
+
+        $client->loginUser($user);
+        $crawler = $client->request('GET', '/');
+
+        $this->assertCount(0, $crawler->filter('input[type="tel"]'));
     }
 }

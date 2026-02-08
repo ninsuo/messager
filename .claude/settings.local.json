@@ -12,7 +12,8 @@
       "Bash(php bin/console importmap:require:*)",
       "Bash(php bin/console lint:twig:*)",
       "Bash(vendor/bin/phpunit:*)",
-      "Bash(make:*)"
+      "Bash(make:*)",
+      "Bash(git mv:*)"
     ]
   }
 }
