@@ -1,18 +1,46 @@
+# =============================================================================
+# Messager - Development overrides (auto-loaded by `docker compose up`)
+# =============================================================================
+#
+# Start the dev stack:
+#   docker compose up -d
+#
+# The app is available at:
+#   http://localhost:90
+#
+# MySQL is accessible from the host at:
+#   mysql -h 127.0.0.1 -P 3316 -u root messager
+#
+# All host ports are offset by +10 to avoid collisions with other projects.
+# =============================================================================
 
 services:
-###> doctrine/doctrine-bundle ###
-  database:
-    ports:
-      - "5432"
-###< doctrine/doctrine-bundle ###
 
-###> symfony/mailer ###
-  mailer:
-    image: axllent/mailpit
+  mysql:
+    user: "1000:1000"
     ports:
-      - "1025"
-      - "8025"
-    environment:
-      MP_SMTP_AUTH_ACCEPT_ANY: 1
-      MP_SMTP_AUTH_ALLOW_INSECURE: 1
-###< symfony/mailer ###
+      - "3316:3306"
+    volumes:
+      - ./docker/mysql/data:/var/lib/mysql
+
+  caddy:
+    build:
+      context: ./docker/caddy
+    ports:
+      - "90:80"
+    volumes:
+      - .:/var/www
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./docker/caddy/logs:/var/log/caddy
+      - ./docker/caddy/data:/data
+      - ./docker/caddy/config:/config
+
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    user: "1000:1000"
+    ports:
+      - "9010:9000"
+    volumes:
+      - .:/var/www

@@ -1,25 +1,38 @@
+# =============================================================================
+# Messager - Docker Compose (common services)
+# =============================================================================
+#
+# This file defines the base services shared across all environments.
+# It is NOT meant to be used alone — always pair it with an override file.
+#
+# Development (default):
+#   docker compose up -d
+#   (automatically loads compose.yaml + compose.override.yaml)
+#
+# Production:
+#   docker compose -f compose.yaml -f compose.prod.yaml up -d
+#
+# Useful commands:
+#   docker compose logs -f          Follow all logs
+#   docker compose exec php bash    Shell into the PHP container
+#   docker compose down             Stop and remove containers
+# =============================================================================
 
 services:
-###> doctrine/doctrine-bundle ###
-  database:
-    image: postgres:${POSTGRES_VERSION:-16}-alpine
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-      # You should definitely change the password in production
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
-      POSTGRES_USER: ${POSTGRES_USER:-app}
-    healthcheck:
-      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}"]
-      timeout: 5s
-      retries: 5
-      start_period: 60s
-    volumes:
-      - database_data:/var/lib/postgresql/data:rw
-      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - ./docker/db/data:/var/lib/postgresql/data:rw
-###< doctrine/doctrine-bundle ###
 
-volumes:
-###> doctrine/doctrine-bundle ###
-  database_data:
-###< doctrine/doctrine-bundle ###
+  mysql:
+    build:
+      context: ./docker/mysql
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-messager}
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    volumes:
+      - ./docker/mysql/my.cnf:/etc/my.cnf
+
+  caddy:
+    depends_on:
+      - php
+
+  php:
+    depends_on:
+      - mysql

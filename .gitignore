@@ -18,3 +18,14 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+###> phpstan/phpstan ###
+phpstan.neon
+###< phpstan/phpstan ###
+
+###> docker ###
+/docker/mysql/data/
+/docker/caddy/logs/
+/docker/caddy/data/
+/docker/caddy/config/
+###< docker ###

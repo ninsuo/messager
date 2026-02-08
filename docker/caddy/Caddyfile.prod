@@ -1,0 +1,21 @@
+{
+    email admin@messager.org
+}
+
+www.messager.org {
+    root * /var/www/public
+
+    encode zstd gzip
+
+    php_fastcgi php:9000
+    file_server
+
+    log {
+        output stdout
+        format json
+    }
+}
+
+messager.org {
+    redir https://www.messager.org{uri} permanent
+}
