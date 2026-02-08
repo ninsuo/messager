@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Messager - {{ book.name }}{% endblock %}
+
+{% block body %}
+    <div class="app-wrapper">
+        <div class="container" style="max-width: 600px;">
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ path('trigger_create') }}" class="btn btn-outline-secondary btn-sm me-3">&larr; Retour</a>
+                <h1 class="app-title mb-0">Répertoire</h1>
+            </div>
+
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success">{{ message }}</div>
+            {% endfor %}
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger">{{ message }}</div>
+            {% endfor %}
+
+            {# ── Book name ── #}
+            <div class="form-section mb-4">
+                <h2 class="form-section-title">Nom</h2>
+                <form method="post" action="{{ path('book_update', {uuid: book.uuid}) }}">
+                    <div class="d-flex gap-2">
+                        <input type="text" class="form-control" name="name" value="{{ book.name }}" required>
+                        <button type="submit" class="btn btn-ms-primary">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+
+            {# ── Contact list ── #}
+            <div class="form-section mb-4">
+                <h2 class="form-section-title">Contacts ({{ book.contacts|length }})</h2>
+
+                {% if book.contacts is empty %}
+                    <p class="text-muted small">Aucun contact dans ce répertoire.</p>
+                {% else %}
+                    <div class="contact-list">
+                        {% for contact in book.contacts %}
+                            <div class="contact-item d-flex align-items-center justify-content-between">
+                                <span class="font-monospace">{{ contact.phoneNumber|mask_phone }}</span>
+                                <form method="post" action="{{ path('book_contact_remove', {uuid: book.uuid, contactUuid: contact.uuid}) }}">
+                                    <button type="submit" class="btn-icon text-danger" title="Retirer"
+                                            onclick="return confirm('Retirer ce contact du répertoire ?')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                    </button>
+                                </form>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            {# ── Add contact ── #}
+            <div class="form-section">
+                <h2 class="form-section-title">Ajouter un contact</h2>
+                <form method="post" action="{{ path('book_contact_add', {uuid: book.uuid}) }}">
+                    <div class="d-flex gap-2">
+                        <input type="tel" class="form-control" name="phone" placeholder="+33 6 12 34 56 78" required>
+                        <button type="submit" class="btn btn-ms-primary">Ajouter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

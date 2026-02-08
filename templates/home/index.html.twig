@@ -4,13 +4,48 @@
 
 {% block body %}
 {% if app.user %}
-    <div class="login-wrapper">
-        <div class="login-card">
-            <div class="logo-section">
-                <img src="{{ asset('logo.svg') }}" alt="Messager">
+    <div class="app-wrapper">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="app-title mb-0">Déclenchements</h1>
+                <a href="{{ path('trigger_create') }}" class="btn btn-ms-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Nouveau
+                </a>
             </div>
 
-            <h1>Hello World</h1>
+            {% if triggers is empty %}
+                <div class="empty-state">
+                    <p class="text-muted">Aucun déclenchement pour le moment.</p>
+                </div>
+            {% else %}
+                <div class="trigger-list">
+                    {% for trigger in triggers %}
+                        <div class="trigger-card">
+                            <div class="d-flex align-items-start gap-3">
+                                <span class="badge {{ trigger.type == 'sms' ? 'bg-info' : 'bg-warning text-dark' }} trigger-badge">
+                                    {{ trigger.type == 'sms' ? 'SMS' : 'Appel' }}
+                                </span>
+                                <div class="flex-grow-1">
+                                    <p class="trigger-content mb-1">{{ trigger.content|length > 120 ? trigger.content|slice(0, 120) ~ '…' : trigger.content }}</p>
+                                    <div class="trigger-meta">
+                                        <span>{{ trigger.contacts|length }} contact{{ trigger.contacts|length > 1 ? 's' : '' }}</span>
+                                        <span class="mx-1">&middot;</span>
+                                        <span>{{ trigger.messages|length }} message{{ trigger.messages|length > 1 ? 's' : '' }}</span>
+                                        {% set errors = trigger.messages|filter(m => m.error is not null)|length %}
+                                        {% if errors > 0 %}
+                                            <span class="mx-1">&middot;</span>
+                                            <span class="text-danger">{{ errors }} erreur{{ errors > 1 ? 's' : '' }}</span>
+                                        {% endif %}
+                                        <span class="mx-1">&middot;</span>
+                                        <span>{{ trigger.createdAt|date('d/m/Y H:i') }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
     </div>
 {% else %}

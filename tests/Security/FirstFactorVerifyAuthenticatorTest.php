@@ -21,7 +21,7 @@ class FirstFactorVerifyAuthenticatorTest extends WebTestCase
 
         $this->assertResponseRedirects('/');
         $client->followRedirect();
-        $this->assertSelectorTextContains('h1', 'Hello World');
+        $this->assertSelectorTextContains('h1', 'Déclenchements');
     }
 
     public function testValidCodeWithSpacesAuthenticates(): void
@@ -40,7 +40,7 @@ class FirstFactorVerifyAuthenticatorTest extends WebTestCase
 
         $this->assertResponseRedirects('/');
         $client->followRedirect();
-        $this->assertSelectorTextContains('h1', 'Hello World');
+        $this->assertSelectorTextContains('h1', 'Déclenchements');
     }
 
     public function testInvalidCodeFails(): void
@@ -155,7 +155,7 @@ class FirstFactorVerifyAuthenticatorTest extends WebTestCase
         $form['verify_code_form[code]'] = $code;
         $client->submit($form);
         $client->followRedirect();
-        $this->assertSelectorTextContains('h1', 'Hello World');
+        $this->assertSelectorTextContains('h1', 'Déclenchements');
 
         // Now logout
         $client->request('GET', '/logout');

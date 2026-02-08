@@ -163,6 +163,9 @@ body {
 
 /* Submit button */
 .btn-ms-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     background: linear-gradient(135deg, var(--ms-primary-light) 0%, var(--ms-primary) 100%);
     border: none;
     color: #fff;
@@ -279,4 +282,146 @@ body {
 
 .admin-table td {
     vertical-align: middle;
+}
+
+/* App wrapper (authenticated pages) */
+.app-wrapper {
+    flex: 1;
+    padding: 2rem 1rem;
+}
+
+.app-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--ms-primary);
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: var(--ms-card-bg);
+    border-radius: 1rem;
+    box-shadow: 0 2px 12px rgba(13, 37, 63, 0.06);
+}
+
+/* Trigger list */
+.trigger-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.trigger-card {
+    background: var(--ms-card-bg);
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 1px 6px rgba(13, 37, 63, 0.06);
+}
+
+.trigger-badge {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.trigger-content {
+    font-size: 0.95rem;
+    color: var(--ms-text);
+    line-height: 1.4;
+}
+
+.trigger-meta {
+    font-size: 0.8rem;
+    color: var(--ms-text-muted);
+}
+
+/* Form sections */
+.form-section {
+    background: var(--ms-card-bg);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 6px rgba(13, 37, 63, 0.06);
+}
+
+.form-section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ms-primary);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--ms-bg);
+}
+
+/* Book list in trigger form */
+.book-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.book-item {
+    padding: 0.5rem 0.25rem;
+    border-radius: 0.375rem;
+    transition: background 0.15s;
+}
+
+.book-item:hover {
+    background: var(--ms-bg);
+}
+
+/* Icon buttons */
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    background: none;
+    border-radius: 0.375rem;
+    color: var(--ms-text-muted);
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+    padding: 0;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.btn-icon:hover {
+    background: var(--ms-bg);
+    color: var(--ms-primary);
+}
+
+.btn-icon.text-danger:hover {
+    color: #dc3545;
+    background: #fff0f0;
+}
+
+/* Contact list in book edit */
+.contact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.contact-item {
+    padding: 0.5rem 0.5rem;
+    border-radius: 0.375rem;
+    transition: background 0.15s;
+}
+
+.contact-item:hover {
+    background: var(--ms-bg);
+}
+
+/* Message progress bar */
+.message-progress {
+    height: 6px;
+    border-radius: 3px;
+    background: #e0e6ed;
+}
+
+.message-progress .progress-bar {
+    transition: width 0.15s, background-color 0.2s;
+    border-radius: 3px;
 }

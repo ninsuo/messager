@@ -116,7 +116,7 @@ class HomeControllerTest extends WebTestCase
         $this->assertStringContainsString(date('Y'), $footer->text());
     }
 
-    public function testAuthenticatedShowsHelloWorld(): void
+    public function testAuthenticatedShowsTriggerList(): void
     {
         $client = static::createClient();
 
@@ -131,7 +131,7 @@ class HomeControllerTest extends WebTestCase
         $client->request('GET', '/');
 
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h1', 'Hello World');
+        $this->assertSelectorTextContains('h1', 'Déclenchements');
         $this->assertSelectorTextContains('title', 'Messager');
     }
 
