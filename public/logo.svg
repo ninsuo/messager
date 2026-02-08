@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50">
+  <defs>
+    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a3a5c"/>
+      <stop offset="100%" stop-color="#0d253f"/>
+    </linearGradient>
+  </defs>
+  <!-- Chat bubble icon -->
+  <rect x="2" y="5" width="40" height="40" rx="10" fill="url(#logoGrad)"/>
+  <path d="M11 14 C11 12, 13 10, 15 10 L29 10 C31 10, 33 12, 33 14 L33 25 C33 27, 31 29, 29 29 L19 29 L14 34 L14 29 L15 29 C13 29, 11 27, 11 25 Z" fill="white" opacity="0.95"/>
+  <circle cx="18.5" cy="19.5" r="1.8" fill="#1a3a5c"/>
+  <circle cx="22" cy="19.5" r="1.8" fill="#1a3a5c"/>
+  <circle cx="25.5" cy="19.5" r="1.8" fill="#1a3a5c"/>
+  <!-- Text -->
+  <text x="50" y="34" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="26" font-weight="700" fill="#0d253f">messager</text>
+</svg>
