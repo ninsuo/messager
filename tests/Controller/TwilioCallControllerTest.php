@@ -53,7 +53,7 @@ class TwilioCallControllerTest extends WebTestCase
         $this->assertNotEmpty($entity->getUuid());
     }
 
-    public function testIncomingCallReturnsEmptyBodyByDefault(): void
+    public function testIncomingCallReturnsNoActiveTriggersMessage(): void
     {
         $client = static::createClient();
 
@@ -65,7 +65,10 @@ class TwilioCallControllerTest extends WebTestCase
         ]);
 
         $this->assertResponseIsSuccessful();
-        $this->assertSame('', $client->getResponse()->getContent());
+
+        $body = $client->getResponse()->getContent();
+        $this->assertStringContainsString('aucun déclenchement actif', $body);
+        $this->assertStringContainsString('not currently on any active triggers', $body);
     }
 
     // ── outgoing (established) ────────────────────────────────────────

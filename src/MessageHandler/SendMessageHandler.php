@@ -52,17 +52,21 @@ class SendMessageHandler
             return;
         }
 
+        $context = ['message_uuid' => $message->getUuid()];
+
         try {
             if (Trigger::TYPE_SMS === $trigger->getType()) {
                 $this->smsProvider->send(
                     $this->fromNumber,
                     $toNumber,
                     $trigger->getContent() ?? '',
+                    $context,
                 );
             } else {
                 $this->callProvider->send(
                     $this->fromNumber,
                     $toNumber,
+                    $context,
                 );
             }
 
