@@ -10,7 +10,8 @@
       "Bash(docker compose:*)",
       "Bash(APP_ENV=prod php bin/console lint:container:*)",
       "Bash(php bin/console importmap:require:*)",
-      "Bash(php bin/console lint:twig:*)"
+      "Bash(php bin/console lint:twig:*)",
+      "Bash(vendor/bin/phpunit:*)"
     ]
   }
 }

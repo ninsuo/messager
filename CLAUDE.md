@@ -76,11 +76,14 @@ Events dispatched: see `App\Event\TwilioEvent` constants (e.g. `TwilioEvent::MES
 
 ## Verification commands
 
+Run all commands inside Docker to ensure PHP 8.4 (the target runtime):
+
 ```bash
-php bin/console lint:container            # DI wiring
-php bin/console debug:router              # Route listing
-php bin/console doctrine:schema:validate  # Entity mappings
-vendor/bin/phpstan analyse src/ --level=6 # Static analysis (level 6)
+docker compose exec php php bin/console lint:container            # DI wiring
+docker compose exec php php bin/console debug:router              # Route listing
+docker compose exec php php bin/console doctrine:schema:validate  # Entity mappings
+docker compose exec php vendor/bin/phpstan analyse src/ --level=6 # Static analysis (level 6)
+docker compose exec php vendor/bin/phpunit                        # Test suite
 ```
 
 ## Twilio SDK quirks
