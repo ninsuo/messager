@@ -1,0 +1,52 @@
+# =============================================================================
+# Messager - Production overrides
+# =============================================================================
+#
+# Start the production stack:
+#   docker compose -f compose.yaml -f compose.prod.yaml up -d
+#
+# Rebuild after a code change:
+#   docker compose -f compose.yaml -f compose.prod.yaml up -d --build
+#
+# The app is available at:
+#   https://www.messager.org
+#
+# Caddy obtains TLS certificates automatically via Let's Encrypt (HTTP-01).
+# Ports 80 and 443 are exposed on standard ports for ACME challenge compatibility.
+# =============================================================================
+
+services:
+
+  mysql:
+    volumes:
+      - mysql_data:/var/lib/mysql
+    deploy:
+      restart_policy:
+        condition: any
+
+  caddy:
+    build:
+      context: ./docker/caddy
+      dockerfile: Dockerfile.prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    deploy:
+      restart_policy:
+        condition: any
+
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile.prod
+    deploy:
+      restart_policy:
+        condition: any
+
+volumes:
+  mysql_data:
+  caddy_data:
+  caddy_config:

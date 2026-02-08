@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(composer require:*)",
+      "Bash(php bin/console lint:container:*)",
+      "Bash(php bin/console debug:router:*)",
+      "Bash(php bin/console doctrine:schema:validate:*)",
+      "Bash(vendor/bin/phpstan analyse:*)",
+      "Bash(docker compose config:*)",
+      "Bash(docker compose:*)"
+    ]
+  }
+}
