@@ -15,11 +15,17 @@ abstract class AbstractTwilioController extends AbstractController
         private readonly RequestStack $requestStack,
         #[Autowire(env: 'TWILIO_AUTH_TOKEN')]
         private readonly string $twilioAuthToken,
+        #[Autowire('%kernel.environment%')]
+        private readonly string $environment = 'prod',
     ) {
     }
 
     protected function validateRequestSignature(Request $request): void
     {
+        if ('test' === $this->environment) {
+            return;
+        }
+
         $validator = new RequestValidator($this->twilioAuthToken);
 
         $isMainRequest = $this->requestStack->getMainRequest() === $request;

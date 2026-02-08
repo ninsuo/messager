@@ -21,10 +21,12 @@ class TwilioMessageController extends AbstractTwilioController
         RequestStack $requestStack,
         #[Autowire(env: 'TWILIO_AUTH_TOKEN')]
         string $twilioAuthToken,
+        #[Autowire('%kernel.environment%')]
+        string $environment,
         private readonly TwilioMessageManager $messageManager,
         ?LoggerInterface $logger = null,
     ) {
-        parent::__construct($requestStack, $twilioAuthToken);
+        parent::__construct($requestStack, $twilioAuthToken, $environment);
 
         $this->logger = $logger ?? new NullLogger();
     }

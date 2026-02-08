@@ -25,12 +25,14 @@ class TwilioStatusController extends AbstractTwilioController
         RequestStack $requestStack,
         #[Autowire(env: 'TWILIO_AUTH_TOKEN')]
         string $twilioAuthToken,
+        #[Autowire('%kernel.environment%')]
+        string $environment,
         private readonly TwilioMessageManager $messageManager,
         private readonly TwilioStatusManager $statusManager,
         private readonly EventDispatcherInterface $eventDispatcher,
         ?LoggerInterface $logger = null,
     ) {
-        parent::__construct($requestStack, $twilioAuthToken);
+        parent::__construct($requestStack, $twilioAuthToken, $environment);
 
         $this->logger = $logger ?? new NullLogger();
     }

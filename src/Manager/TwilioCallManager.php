@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Twilio\Rest\Client;
 use Twilio\TwiML\VoiceResponse;
 
 class TwilioCallManager
@@ -119,7 +118,7 @@ class TwilioCallManager
                 );
             }
 
-            $outbound = $this->getClient()->calls->create($to, $from, $options);
+            $outbound = $this->twilio->createCall($to, $from, $options);
 
             $entity->setSid($outbound->sid);
             $entity->setStatus($outbound->status);
@@ -187,8 +186,4 @@ class TwilioCallManager
         }
     }
 
-    private function getClient(): Client
-    {
-        return $this->twilio->getClient();
-    }
 }

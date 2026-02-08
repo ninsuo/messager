@@ -13,7 +13,6 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Twilio\Rest\Client;
 use Twilio\TwiML\MessagingResponse;
 
 class TwilioMessageManager
@@ -96,7 +95,7 @@ class TwilioMessageManager
         $entity->setContext($context);
 
         try {
-            $outbound = $this->getClient()->messages->create($to, [
+            $outbound = $this->twilio->sendMessage($to, [
                 'from' => $from,
                 'body' => $message,
                 'statusCallback' => $options['statusCallback'],
@@ -124,8 +123,4 @@ class TwilioMessageManager
         return $entity;
     }
 
-    private function getClient(): Client
-    {
-        return $this->twilio->getClient();
-    }
 }
