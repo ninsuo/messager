@@ -5,10 +5,10 @@ namespace App\Provider\SMS;
 use App\Entity\FakeSms;
 use App\Repository\FakeSmsRepository;
 
-class FakeSmsProvider implements SmsProvider
+readonly class FakeSmsProvider implements SmsProvider
 {
     public function __construct(
-        private readonly FakeSmsRepository $fakeSmsRepository,
+        private FakeSmsRepository $fakeSmsRepository,
     ) {
     }
 

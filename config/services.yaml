@@ -30,3 +30,14 @@ when@dev:
 
         App\Provider\Call\CallProvider:
             alias: App\Provider\Call\FakeCallProvider
+
+when@test:
+    services:
+        _defaults:
+            public: true
+
+        App\Provider\SMS\SmsProvider:
+            alias: App\Provider\SMS\FakeSmsProvider
+
+        App\Provider\Call\CallProvider:
+            alias: App\Provider\Call\FakeCallProvider

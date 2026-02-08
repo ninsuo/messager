@@ -37,11 +37,6 @@ class TwilioMessageManager
         return $this->messageRepository->findOneBy(['uuid' => $uuid]);
     }
 
-    public function getBySid(string $sid): ?TwilioMessage
-    {
-        return $this->messageRepository->findOneBy(['sid' => $sid]);
-    }
-
     public function save(TwilioMessage $outbound): void
     {
         $this->messageRepository->save($outbound);

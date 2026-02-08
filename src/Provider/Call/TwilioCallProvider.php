@@ -4,7 +4,7 @@ namespace App\Provider\Call;
 
 use App\Manager\TwilioCallManager;
 
-class TwilioCallProvider implements CallProvider
+readonly class TwilioCallProvider implements CallProvider
 {
     public function __construct(
         private readonly TwilioCallManager $callManager,

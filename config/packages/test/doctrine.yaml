@@ -1,4 +1,0 @@
-doctrine:
-    dbal:
-        wrapper_class: null
-        driver_class: 'Doctrine\DBAL\Driver\PDO\MySQL\Driver'

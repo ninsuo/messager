@@ -4,10 +4,10 @@ namespace App\Provider\SMS;
 
 use App\Manager\TwilioMessageManager;
 
-class TwilioSmsProvider implements SmsProvider
+readonly class TwilioSmsProvider implements SmsProvider
 {
     public function __construct(
-        private readonly TwilioMessageManager $messageManager,
+        private TwilioMessageManager $messageManager,
     ) {
     }
 

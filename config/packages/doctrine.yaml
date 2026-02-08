@@ -26,8 +26,9 @@ doctrine:
 when@test:
     doctrine:
         dbal:
-            # "TEST_TOKEN" is typically set by ParaTest
             dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+            wrapper_class: null
+            driver_class: 'Doctrine\DBAL\Driver\PDO\MySQL\Driver'
 
 when@prod:
     doctrine:

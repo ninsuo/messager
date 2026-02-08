@@ -11,11 +11,11 @@ use Symfony\Component\Uid\Uuid;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twilio\TwiML\VoiceResponse;
 
-class FakeCallProvider implements CallProvider
+readonly class FakeCallProvider implements CallProvider
 {
     public function __construct(
-        private readonly FakeCallRepository $fakeCallRepository,
-        private readonly EventDispatcherInterface $eventDispatcher,
+        private FakeCallRepository $fakeCallRepository,
+        private EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
