@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Messager - Sandbox SMS{% endblock %}
+
+{% block body %}
+    <div class="admin-wrapper">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1 class="admin-title mb-0">SMS</h1>
+                <a href="{{ path('sandbox') }}" class="btn btn-outline-secondary btn-sm">Retour</a>
+            </div>
+
+            {% if messages is empty %}
+                <div class="empty-state">
+                    <p class="text-muted mb-0">Aucun SMS pour le moment.</p>
+                </div>
+            {% else %}
+                <div class="admin-table">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Direction</th>
+                                <th>De</th>
+                                <th>Vers</th>
+                                <th>Message</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sms in messages %}
+                                <tr>
+                                    <td>
+                                        {% if sms.direction == 'sent' %}
+                                            <span class="badge bg-primary">Envoyé</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Reçu</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ sms.fromNumber }}</td>
+                                    <td>{{ sms.toNumber }}</td>
+                                    <td>{{ sms.message|length > 80 ? sms.message|slice(0, 80) ~ '...' : sms.message }}</td>
+                                    <td class="text-muted">{{ sms.createdAt|date('d/m/Y H:i') }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

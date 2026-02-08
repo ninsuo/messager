@@ -58,6 +58,7 @@ readonly class FakeCallProvider implements CallProvider
         $fakeCall->setToNumber($to);
         $fakeCall->setType($hookType);
         $fakeCall->setContent($content);
+        $fakeCall->setContext($context ?: null);
 
         $this->fakeCallRepository->save($fakeCall);
 

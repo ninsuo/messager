@@ -29,6 +29,9 @@ class FakeCall
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $content = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $context = null;
+
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private \DateTime $createdAt;
 
@@ -86,6 +89,24 @@ class FakeCall
     public function setContent(?string $content): static
     {
         $this->content = $content;
+
+        return $this;
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function getContext(): ?array
+    {
+        return $this->context ? json_decode($this->context, true) : null;
+    }
+
+    /**
+     * @param array<string, mixed>|null $context
+     */
+    public function setContext(?array $context): static
+    {
+        $this->context = $context !== null ? json_encode($context) : null;
 
         return $this;
     }

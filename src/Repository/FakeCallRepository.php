@@ -22,6 +22,26 @@ class FakeCallRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
     }
 
+    /**
+     * @return array<string, int> Map of toNumber => max(id) for calls with content
+     */
+    public function findLatestIdsByPhone(): array
+    {
+        $rows = $this->createQueryBuilder('c')
+            ->select('c.toNumber, MAX(c.id) as latestId')
+            ->where('c.content IS NOT NULL')
+            ->groupBy('c.toNumber')
+            ->getQuery()
+            ->getArrayResult();
+
+        $map = [];
+        foreach ($rows as $row) {
+            $map[$row['toNumber']] = (int) $row['latestId'];
+        }
+
+        return $map;
+    }
+
     public function truncate(): void
     {
         $this->createQueryBuilder('c')

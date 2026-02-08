@@ -148,7 +148,7 @@ class MessageSubscriber implements EventSubscriberInterface
         $this->entityManager->flush();
 
         $response = new VoiceResponse();
-        $response->say('Merci, votre réponse a été enregistrée.', [
+        $response->say('Bonne journée.', [
             'language' => 'fr-FR',
         ]);
 

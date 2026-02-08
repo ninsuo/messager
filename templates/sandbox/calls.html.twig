@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Messager - Sandbox Appels{% endblock %}
+
+{% block body %}
+    <div class="admin-wrapper">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1 class="admin-title mb-0">Appels</h1>
+                <a href="{{ path('sandbox') }}" class="btn btn-outline-secondary btn-sm">Retour</a>
+            </div>
+
+            {% if calls is empty %}
+                <div class="empty-state">
+                    <p class="text-muted mb-0">Aucun appel pour le moment.</p>
+                </div>
+            {% else %}
+                <div class="trigger-list">
+                    {% for call in calls %}
+                        <div class="sandbox-call-card">
+                            <div class="d-flex align-items-start gap-2 mb-2">
+                                {% if call.type == 'establish' %}
+                                    <span class="badge bg-primary trigger-badge">Appel</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark trigger-badge">Touche</span>
+                                {% endif %}
+                                <div class="flex-grow-1">
+                                    <div class="trigger-content">
+                                        <strong>{{ call.fromNumber }}</strong> &rarr; <strong>{{ call.toNumber }}</strong>
+                                    </div>
+                                    {% if call.content %}
+                                        <div class="sandbox-call-content mt-1">
+                                            {{ call.content|twiml_to_text }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="trigger-meta mt-1">{{ call.createdAt|date('d/m/Y H:i:s') }}</div>
+                                </div>
+                            </div>
+
+                            {% if latestIds[call.toNumber] is defined and latestIds[call.toNumber] == call.id %}
+                                <div class="sandbox-keypad">
+                                    {% for digit in 0..9 %}
+                                        <form method="post" action="{{ path('sandbox_call_key_press', {id: call.id}) }}">
+                                            <input type="hidden" name="digit" value="{{ digit }}">
+                                            <button type="submit" class="sandbox-key-btn">{{ digit }}</button>
+                                        </form>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

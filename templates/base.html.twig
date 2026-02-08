@@ -21,6 +21,9 @@
                 </a>
                 {% if app.user %}
                     <div class="navbar-ms-actions">
+                        {% if app.environment == 'dev' %}
+                            <a href="{{ path('sandbox') }}" class="btn btn-outline-warning btn-sm">Sandbox</a>
+                        {% endif %}
                         {% if is_granted('ROLE_ADMIN') %}
                             <a href="{{ path('admin') }}" class="btn btn-outline-light btn-sm">Admin</a>
                         {% endif %}
