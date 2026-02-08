@@ -2,12 +2,15 @@
 
 namespace App\Entity;
 
+use App\Attribute\BlindIndex;
+use App\Attribute\Encrypted;
+use App\Contract\EncryptedResourceInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\MappedSuperclass]
 #[ORM\HasLifecycleCallbacks]
-abstract class AbstractTwilioEntity
+abstract class AbstractTwilioEntity implements EncryptedResourceInterface
 {
     public const DIRECTION_INBOUND = 'inbound';
     public const DIRECTION_OUTBOUND = 'outbound';
@@ -23,14 +26,25 @@ abstract class AbstractTwilioEntity
     #[ORM\Column(length: 16)]
     protected ?string $direction = null;
 
+    #[Encrypted]
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     protected ?string $message = null;
 
-    #[ORM\Column(length: 32)]
+    #[Encrypted]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     protected ?string $fromNumber = null;
 
-    #[ORM\Column(length: 16)]
+    #[BlindIndex('fromNumber')]
+    #[ORM\Column(length: 64, nullable: true)]
+    protected ?string $blindFromNumber = null;
+
+    #[Encrypted]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     protected ?string $toNumber = null;
+
+    #[BlindIndex('toNumber')]
+    #[ORM\Column(length: 64, nullable: true)]
+    protected ?string $blindToNumber = null;
 
     #[ORM\Column(length: 64, nullable: true)]
     protected ?string $sid = null;
@@ -55,9 +69,9 @@ abstract class AbstractTwilioEntity
         return $this->id;
     }
 
-    public function getUuid(): ?string
+    public function getUuid(): string
     {
-        return $this->uuid;
+        return $this->uuid ?? '';
     }
 
     public function setUuid(string $uuid): static
@@ -96,9 +110,21 @@ abstract class AbstractTwilioEntity
         return $this->fromNumber;
     }
 
-    public function setFromNumber(string $fromNumber): static
+    public function setFromNumber(?string $fromNumber): static
     {
         $this->fromNumber = $fromNumber;
+
+        return $this;
+    }
+
+    public function getBlindFromNumber(): ?string
+    {
+        return $this->blindFromNumber;
+    }
+
+    public function setBlindFromNumber(?string $blindFromNumber): static
+    {
+        $this->blindFromNumber = $blindFromNumber;
 
         return $this;
     }
@@ -108,9 +134,21 @@ abstract class AbstractTwilioEntity
         return $this->toNumber;
     }
 
-    public function setToNumber(string $toNumber): static
+    public function setToNumber(?string $toNumber): static
     {
         $this->toNumber = $toNumber;
+
+        return $this;
+    }
+
+    public function getBlindToNumber(): ?string
+    {
+        return $this->blindToNumber;
+    }
+
+    public function setBlindToNumber(?string $blindToNumber): static
+    {
+        $this->blindToNumber = $blindToNumber;
 
         return $this;
     }
