@@ -122,5 +122,4 @@ class TwilioMessageManager
 
         return $entity;
     }
-
 }

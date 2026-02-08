@@ -7,11 +7,10 @@
         <div class="login-card">
             <div class="logo-section">
                 <img src="{{ asset('logo.svg') }}" alt="Messager">
-                <p>Messagerie accessible à tous</p>
             </div>
 
             <h1>Connexion</h1>
-            <p class="text-center text-muted mb-4">Entrez votre numéro de téléphone pour continuer</p>
+            <p class="text-center text-muted mb-4">Entrez votre numéro de téléphone</p>
 
             <form method="post" action="{{ path('home') }}">
                 <div class="mb-3">
@@ -38,9 +37,6 @@
                 </button>
             </form>
 
-            <p class="text-center text-muted mt-4 mb-0" style="font-size: 0.8rem;">
-                En vous connectant, vous acceptez nos conditions d'utilisation.
-            </p>
         </div>
     </div>
 {% endblock %}
