@@ -47,7 +47,7 @@ RUN chown -R www-data:www-data /var/www
 WORKDIR /var/www
 USER www-data
 
-RUN composer install --optimize-autoloader --no-dev --no-scripts \
+RUN composer install --optimize-autoloader --no-scripts \
     && bin/console cache:warmup
 
 ENTRYPOINT ["php-fpm"]

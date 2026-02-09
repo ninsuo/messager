@@ -5,6 +5,11 @@ framework:
     # Note that the session will be started ONLY if you read or write from it.
     session: true
 
+    # Trust reverse proxies (Caddy in prod, ngrok in dev) so Symfony
+    # honours X-Forwarded-* headers (scheme, host, port, etc.).
+    trusted_proxies: '%env(default::SYMFONY_TRUSTED_PROXIES)%'
+    trusted_headers: [ 'x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port', 'x-forwarded-prefix' ]
+
     #esi: true
     #fragments: true
 

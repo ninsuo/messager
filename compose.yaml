@@ -23,9 +23,12 @@ services:
   mysql:
     build:
       context: ./docker/mysql
+    user: "999:999"
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-messager}
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_USER: ${MYSQL_USER:-messager}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
       - ./docker/mysql/my.cnf:/etc/my.cnf
 
@@ -36,3 +39,25 @@ services:
   php:
     depends_on:
       - mysql
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      APP_SECRET: ${APP_SECRET}
+      APP_ENV: ${APP_ENV:-prod}
+
+  worker1:
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      APP_SECRET: ${APP_SECRET}
+      APP_ENV: ${APP_ENV:-prod}
+
+  worker2:
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      APP_SECRET: ${APP_SECRET}
+      APP_ENV: ${APP_ENV:-prod}
+
+  worker3:
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      APP_SECRET: ${APP_SECRET}
+      APP_ENV: ${APP_ENV:-prod}

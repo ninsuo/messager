@@ -19,7 +19,7 @@ services:
 
   mysql:
     volumes:
-      - mysql_data:/var/lib/mysql
+      - /mnt/data/mysql:/var/lib/mysql
     deploy:
       restart_policy:
         condition: any
@@ -81,6 +81,5 @@ services:
         condition: any
 
 volumes:
-  mysql_data:
   caddy_data:
   caddy_config:
