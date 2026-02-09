@@ -7,7 +7,7 @@
         <div class="container" style="max-width: 600px;">
             <div class="d-flex align-items-center mb-4">
                 <a href="{{ path('trigger_create') }}" class="btn btn-outline-secondary btn-sm me-3">&larr; Retour</a>
-                <h1 class="app-title mb-0">Répertoire</h1>
+                <h1 class="app-title mb-0">Liste de contacts</h1>
             </div>
 
             {% for message in app.flashes('success') %}
@@ -33,7 +33,7 @@
                 <h2 class="form-section-title">Contacts ({{ book.contacts|length }})</h2>
 
                 {% if book.contacts is empty %}
-                    <p class="text-muted small">Aucun contact dans ce répertoire.</p>
+                    <p class="text-muted small">Aucun contact dans cette liste.</p>
                 {% else %}
                     <div class="contact-list">
                         {% for contact in book.contacts %}
@@ -41,7 +41,7 @@
                                 <span class="font-monospace">{{ contact.phoneNumber|mask_phone }}</span>
                                 <form method="post" action="{{ path('book_contact_remove', {uuid: book.uuid, contactUuid: contact.uuid}) }}">
                                     <button type="submit" class="btn-icon text-danger" title="Retirer"
-                                            onclick="return confirm('Retirer ce contact du répertoire ?')">
+                                            onclick="return confirm('Retirer ce contact de la liste ?')">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                     </button>
                                 </form>

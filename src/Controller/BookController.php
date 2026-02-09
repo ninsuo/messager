@@ -6,6 +6,7 @@ use App\Entity\Book;
 use App\Entity\Contact;
 use App\Repository\BookRepository;
 use App\Repository\ContactRepository;
+use App\Tool\Phone;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,7 +41,7 @@ class BookController extends AbstractController
         $name = trim($request->request->getString('name'));
 
         if ('' === $name) {
-            $this->addFlash('error', 'Le nom du répertoire ne peut pas être vide.');
+            $this->addFlash('error', 'Le nom de la liste de contacts ne peut pas être vide.');
 
             return $this->redirectToRoute('book_edit', ['uuid' => $book->getUuid()]);
         }
@@ -48,7 +49,7 @@ class BookController extends AbstractController
         $book->setName($name);
         $this->bookRepository->save($book);
 
-        $this->addFlash('success', 'Répertoire mis à jour.');
+        $this->addFlash('success', 'Liste de contacts mise à jour.');
 
         return $this->redirectToRoute('book_edit', ['uuid' => $book->getUuid()]);
     }
@@ -58,10 +59,10 @@ class BookController extends AbstractController
         #[MapEntity(mapping: ['uuid' => 'uuid'])] Book $book,
         Request $request,
     ): Response {
-        $phone = trim($request->request->getString('phone'));
+        $phone = Phone::normalize(trim($request->request->getString('phone')));
 
-        if ('' === $phone) {
-            $this->addFlash('error', 'Le numéro de téléphone ne peut pas être vide.');
+        if (null === $phone) {
+            $this->addFlash('error', 'Numéro de téléphone français invalide.');
 
             return $this->redirectToRoute('book_edit', ['uuid' => $book->getUuid()]);
         }
@@ -76,7 +77,7 @@ class BookController extends AbstractController
         }
 
         if ($book->getContacts()->contains($contact)) {
-            $this->addFlash('error', 'Ce contact est déjà dans le répertoire.');
+            $this->addFlash('error', 'Ce contact est déjà dans la liste.');
 
             return $this->redirectToRoute('book_edit', ['uuid' => $book->getUuid()]);
         }
@@ -115,7 +116,7 @@ class BookController extends AbstractController
     {
         $this->bookRepository->remove($book);
 
-        $this->addFlash('success', 'Répertoire supprimé.');
+        $this->addFlash('success', 'Liste de contacts supprimée.');
 
         return $this->redirectToRoute('trigger_create');
     }

@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\AdminCreateUserFormType;
 use App\Repository\UserRepository;
+use App\Tool\Phone;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -48,7 +49,13 @@ class AdminController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $phone = $form->get('phone')->getData();
+            $phone = Phone::normalize((string) $form->get('phone')->getData());
+
+            if (null === $phone) {
+                $this->addFlash('error', 'Numéro de téléphone français invalide.');
+
+                return $this->redirectToRoute('admin_users');
+            }
 
             if ($this->userRepository->findByPhoneNumber($phone)) {
                 $this->addFlash('error', 'Un utilisateur avec ce numéro existe déjà.');

@@ -6,6 +6,7 @@ use App\Manager\UnguessableCodeManager;
 use App\Provider\SMS\SmsProvider;
 use App\Repository\UserRepository;
 use App\Security\Exception\CodeSentException;
+use App\Tool\Phone;
 use App\Tool\Random;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -40,10 +41,10 @@ class FirstFactorTriggerAuthenticator extends AbstractAuthenticator implements A
     {
         /** @var array{phone?: string} $formData */
         $formData = $request->request->all('phone_form');
-        $phone = trim($formData['phone'] ?? '');
+        $phone = Phone::normalize(trim($formData['phone'] ?? ''));
 
-        if ('' === $phone) {
-            throw new CustomUserMessageAuthenticationException('Veuillez entrer un numéro de téléphone.');
+        if (null === $phone) {
+            throw new CustomUserMessageAuthenticationException('Veuillez entrer un numéro de téléphone français valide.');
         }
 
         $verificationCode = Random::numeric(6);

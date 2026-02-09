@@ -13,6 +13,7 @@ use App\Repository\ContactRepository;
 use App\Repository\MessageRepository;
 use App\Repository\TriggerRepository;
 use App\Tool\GSM;
+use App\Tool\Phone;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -79,8 +80,13 @@ class TriggerController extends AbstractController
             $phonesRaw = (string) ($data['phones'] ?? '');
             $phoneLines = explode("\n", $phonesRaw);
             foreach ($phoneLines as $line) {
-                $phone = trim($line);
-                if ('' === $phone) {
+                $raw = trim($line);
+                if ('' === $raw) {
+                    continue;
+                }
+
+                $phone = Phone::normalize($raw);
+                if (null === $phone) {
                     continue;
                 }
 

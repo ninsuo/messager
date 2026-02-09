@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Repository\UserRepository;
+use App\Tool\Phone;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -31,7 +32,14 @@ class UserAdminCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $phone = $input->getArgument('phone');
+        $phone = Phone::normalize($input->getArgument('phone'));
+
+        if (null === $phone) {
+            $output->writeln('Invalid French phone number.');
+
+            return Command::FAILURE;
+        }
+
         $user = $this->userRepository->findByPhoneNumber($phone);
 
         if (!$user) {

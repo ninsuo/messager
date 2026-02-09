@@ -31,7 +31,7 @@ class TriggerCreateFormType extends AbstractType
                 'attr' => [
                     'class' => 'form-control',
                     'rows' => 4,
-                    'placeholder' => "Un numéro par ligne\n+33 6 12 34 56 78\n+33 6 98 76 54 32",
+                    'placeholder' => "Un numéro par ligne, au format de votre choix (ex: 0612345678 ou +33612345678)",
                 ],
             ])
             ->add('saveAsBook', CheckboxType::class, [
@@ -41,7 +41,7 @@ class TriggerCreateFormType extends AbstractType
                 'required' => false,
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'Nom du répertoire',
+                    'placeholder' => 'Nom de la liste de contacts',
                 ],
             ])
             ->add('type', ChoiceType::class, [

@@ -29,7 +29,7 @@ class BookControllerTest extends WebTestCase
         $client->request('GET', '/book/' . $book->getUuid() . '/edit');
 
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h1', 'Répertoire');
+        $this->assertSelectorTextContains('h1', 'Liste de contacts');
     }
 
     public function testEditShowsBookName(): void
@@ -85,7 +85,7 @@ class BookControllerTest extends WebTestCase
 
         $this->assertResponseRedirects('/book/' . $book->getUuid() . '/edit');
         $client->followRedirect();
-        $this->assertSelectorTextContains('.alert-success', 'mis à jour');
+        $this->assertSelectorTextContains('.alert-success', 'mise à jour');
 
         $updated = self::getContainer()->get(\App\Repository\BookRepository::class)
             ->findOneBy(['uuid' => $book->getUuid()]);
@@ -188,7 +188,7 @@ class BookControllerTest extends WebTestCase
 
         $this->assertResponseRedirects('/book/' . $book->getUuid() . '/edit');
         $client->followRedirect();
-        $this->assertSelectorTextContains('.alert-danger', 'déjà dans le répertoire');
+        $this->assertSelectorTextContains('.alert-danger', 'déjà dans la liste');
     }
 
     public function testAddContactEmptyPhoneShowsError(): void
@@ -204,7 +204,7 @@ class BookControllerTest extends WebTestCase
 
         $this->assertResponseRedirects('/book/' . $book->getUuid() . '/edit');
         $client->followRedirect();
-        $this->assertSelectorTextContains('.alert-danger', 'vide');
+        $this->assertSelectorTextContains('.alert-danger', 'invalide');
     }
 
     public function testRemoveContact(): void

@@ -17,10 +17,10 @@
                     <h2 class="form-section-title">Audience</h2>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Répertoires</label>
+                        <label class="form-label fw-semibold">Listes de contacts</label>
 
                         {% if form.books|length == 0 %}
-                            <p class="text-muted small">Aucun répertoire disponible.</p>
+                            <p class="text-muted small">Aucune liste disponible.</p>
                         {% else %}
                             <div class="book-list">
                                 {% for child in form.books %}
@@ -38,7 +38,7 @@
                                            class="btn-icon text-danger"
                                            title="Supprimer"
                                            data-turbo-method="post"
-                                           data-turbo-confirm="Supprimer le répertoire « {{ book.name }} » ?">
+                                           data-turbo-confirm="Supprimer la liste « {{ book.name }} » ?">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                                         </a>
                                     </div>
@@ -55,7 +55,7 @@
                     <div data-controller="book-save">
                         <div class="form-check mb-2">
                             {{ form_widget(form.saveAsBook, {attr: {class: 'form-check-input', 'data-book-save-target': 'toggle', 'data-action': 'change->book-save#toggle'}}) }}
-                            <label class="form-check-label" for="{{ form.saveAsBook.vars.id }}">Sauvegarder comme répertoire</label>
+                            <label class="form-check-label" for="{{ form.saveAsBook.vars.id }}">Sauvegarder comme liste de contacts</label>
                         </div>
                         <div class="d-none" data-book-save-target="nameField">
                             {{ form_widget(form.bookName) }}
