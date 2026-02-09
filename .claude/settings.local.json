@@ -14,7 +14,8 @@
       "Bash(vendor/bin/phpunit:*)",
       "Bash(make:*)",
       "Bash(git mv:*)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "Bash(grep:*)"
     ]
   }
 }

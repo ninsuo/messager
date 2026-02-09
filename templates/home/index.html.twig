@@ -21,28 +21,8 @@
             {% else %}
                 <div class="trigger-list">
                     {% for trigger in triggers %}
-                        <div class="trigger-card">
-                            <div class="d-flex align-items-start gap-3">
-                                <span class="badge {{ trigger.type == 'sms' ? 'bg-info' : 'bg-warning text-dark' }} trigger-badge">
-                                    {{ trigger.type == 'sms' ? 'SMS' : 'Appel' }}
-                                </span>
-                                <div class="flex-grow-1">
-                                    <p class="trigger-content mb-1">{{ trigger.content|length > 120 ? trigger.content|slice(0, 120) ~ '…' : trigger.content }}</p>
-                                    <div class="trigger-meta">
-                                        <span>{{ trigger.contacts|length }} contact{{ trigger.contacts|length > 1 ? 's' : '' }}</span>
-                                        <span class="mx-1">&middot;</span>
-                                        <span>{{ trigger.messages|length }} message{{ trigger.messages|length > 1 ? 's' : '' }}</span>
-                                        {% set errors = trigger.messages|filter(m => m.error is not null)|length %}
-                                        {% if errors > 0 %}
-                                            <span class="mx-1">&middot;</span>
-                                            <span class="text-danger">{{ errors }} erreur{{ errors > 1 ? 's' : '' }}</span>
-                                        {% endif %}
-                                        <span class="mx-1">&middot;</span>
-                                        <span>{{ trigger.createdAt|date('d/m/Y H:i') }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        {% set counts = statusCounts[trigger.id] ?? {pending: 0, sent: 0, delivered: 0, failed: 0, total: 0} %}
+                        {% include 'home/_trigger_card.html.twig' with {trigger: trigger, counts: counts} only %}
                     {% endfor %}
                 </div>
             {% endif %}

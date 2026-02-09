@@ -19,19 +19,30 @@
                     <img src="{{ asset('favicon.svg') }}" alt="" width="32" height="32">
                     messager
                 </a>
-                {% if app.user %}
                     <div class="navbar-ms-actions">
                         {% if app.environment == 'dev' %}
                             <a href="{{ path('sandbox') }}" class="btn btn-outline-warning btn-sm">Sandbox</a>
                         {% endif %}
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <a href="{{ path('admin') }}" class="btn btn-outline-light btn-sm">Admin</a>
+                        {% if app.user %}
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <a href="{{ path('admin') }}" class="btn btn-outline-light btn-sm">Admin</a>
+                            {% endif %}
+                            <a href="{{ path('logout') }}" class="btn btn-outline-light btn-sm">Déconnexion</a>
                         {% endif %}
-                        <a href="{{ path('logout') }}" class="btn btn-outline-light btn-sm">Déconnexion</a>
                     </div>
-                {% endif %}
             </div>
         </nav>
+
+        {% for message in app.flashes('success') %}
+            <div class="container mt-3">
+                <div class="alert alert-success mb-0">{{ message }}</div>
+            </div>
+        {% endfor %}
+        {% for message in app.flashes('error') %}
+            <div class="container mt-3">
+                <div class="alert alert-danger mb-0">{{ message }}</div>
+            </div>
+        {% endfor %}
 
         {% block body %}{% endblock %}
 

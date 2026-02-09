@@ -470,3 +470,31 @@ body {
     transition: width 0.15s, background-color 0.2s;
     border-radius: 3px;
 }
+
+/* Trigger status progress bar */
+.trigger-progress {
+    height: 6px;
+    border-radius: 3px;
+    background: #e0e6ed;
+}
+
+.trigger-progress .progress-bar {
+    transition: width 0.3s;
+}
+
+.trigger-status-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--ms-text-muted);
+}
+
+.trigger-status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 0.2rem;
+    vertical-align: middle;
+}
