@@ -40,6 +40,7 @@ src/
 │   └── Call/         # CallProvider interface, TwilioCallProvider, FakeCallProvider
 ├── Repository/       # Doctrine repositories
 ├── Service/          # Service layer (TwilioClient)
+├── Tool/             # Utility classes (Phone normalization, GSM alphabet)
 └── Twig/             # Twig extensions (custom filters)
 ```
 
@@ -93,7 +94,25 @@ docker compose exec php vendor/bin/phpunit                        # Test suite
 
 Stimulus controllers live in `assets/controllers/` with the `_controller.js` naming convention (e.g. `code_input_controller.js` → `data-controller="code-input"`). Asset Mapper auto-discovers them — no manual registration needed.
 
+Key Stimulus controllers:
+- `code_input_controller.js` — 6-digit verification code input with auto-advance
+- `trigger_status_controller.js` — polls a URL at intervals, swaps innerHTML, self-terminates when the server response omits `data-controller="trigger-status"` (i.e. when no messages are pending)
+
 CSS styles are in `assets/styles/app.css` using CSS custom properties prefixed `--ms-` (e.g. `--ms-primary`, `--ms-accent`).
+
+## Partial templates and polling pattern
+
+Auto-refreshing pages use a partial template pattern:
+1. A partial template (`_trigger_card.html.twig`, `_detail_body.html.twig`) renders a self-contained HTML fragment
+2. The fragment's root `<div>` gets `data-controller="trigger-status"` + `data-trigger-status-url-value` when polling should be active
+3. The Stimulus controller fetches the URL, parses the HTML response, replaces its own innerHTML
+4. When the server omits the `data-controller` attribute (pending=0), the controller detects this and stops polling
+
+Flash messages are rendered globally in `base.html.twig` (success + error).
+
+## Phone normalization
+
+`App\Tool\Phone::normalize(string $phone): ?string` converts French phone numbers from various formats (spaces, dots, dashes, `0033` prefix, local `06…` format) to E.164 (`+33XXXXXXXXX`). Returns `null` for invalid numbers. Used at every phone input entry point: authenticator, admin user creation, contact management, trigger creation, CLI commands.
 
 ## Auth flow
 
@@ -101,6 +120,21 @@ CSS styles are in `assets/styles/app.css` using CSS custom properties prefixed `
 2. `POST /auth` — handled by `FirstFactorTriggerAuthenticator`, sends SMS code, redirects to `/verify/{secret}`
 3. `GET /verify/{secret}` — 6-digit code input (Stimulus-enhanced individual digit boxes synced to hidden form field)
 4. `POST /verify/{secret}` — handled by `FirstFactorVerifyAuthenticator`, authenticates user
+
+## Trigger pages
+
+- `GET /trigger/create` — trigger creation form (audience + type + content)
+- `POST /trigger/create` — creates trigger, dispatches async messages, redirects to detail
+- `GET /trigger/{uuid}` — trigger detail page (progress bar + message table with statuses)
+- `POST /trigger/{uuid}/delete` — deletes trigger and its messages (ownership-checked)
+- `GET /trigger/{uuid}/status` — partial HTML for home page trigger card polling
+- `GET /trigger/{uuid}/messages` — partial HTML for detail page polling
+
+Trigger deletion uses `MessageRepository::removeByTrigger()` (DQL bulk DELETE) before removing the trigger entity, because Doctrine's `cascade: ['remove']` does not add `ON DELETE CASCADE` at the DB level.
+
+## Help page
+
+- `GET /aide` — public user documentation page (French), linked from the navbar help icon
 
 ## Admin section
 
@@ -113,6 +147,14 @@ Routes under `/admin` are protected by `ROLE_ADMIN` (both `access_control` in `s
 - `POST /admin/users/{uuid}/revoke-admin` — demote (cannot self-demote)
 - `POST /admin/users/{uuid}/delete` — delete user (cannot delete self or admins)
 
+## Async messaging
+
+Trigger creation dispatches `TriggerMessage` via Symfony Messenger. The `TriggerHandler` creates `Message` entities and dispatches individual `SendMessage` commands. The `SendMessageHandler` calls the appropriate provider (SMS or Call). Messages go through statuses: pending → sent → delivered (or failed).
+
 ## Twilio SDK quirks
 
 The Twilio PHP SDK uses magic methods (`__call`, `__get`). PHPStan cannot resolve `$client->calls(...)` or `$client->messages(...)`. Use `@phpstan-ignore method.notFound` for these calls.
+
+## Testing
+
+PHPUnit 13 is used. Data providers must use `#[DataProvider('methodName')]` PHP attribute (not `@dataProvider` annotation). Test classes extend `Symfony\Bundle\FrameworkBundle\Test\KernelTestCase` or `WebTestCase`.
