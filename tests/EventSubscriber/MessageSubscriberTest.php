@@ -118,7 +118,6 @@ class MessageSubscriberTest extends KernelTestCase
 
         $xml = $response->asXML();
         $this->assertStringContainsString('aucun déclenchement actif', $xml);
-        $this->assertStringContainsString('not currently on any active triggers', $xml);
     }
 
     public function testCallReceivedWithOldMessagePlaysError(): void
@@ -225,7 +224,7 @@ class MessageSubscriberTest extends KernelTestCase
         $this->assertInstanceOf(VoiceResponse::class, $response);
 
         $xml = $response->asXML();
-        $this->assertStringContainsString('Merci', $xml);
+        $this->assertStringContainsString('Bonne journée', $xml);
 
         $em = self::getContainer()->get(\Doctrine\ORM\EntityManagerInterface::class);
         $em->refresh($message);

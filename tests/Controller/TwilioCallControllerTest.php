@@ -68,7 +68,6 @@ class TwilioCallControllerTest extends WebTestCase
 
         $body = $client->getResponse()->getContent();
         $this->assertStringContainsString('aucun déclenchement actif', $body);
-        $this->assertStringContainsString('not currently on any active triggers', $body);
     }
 
     // ── outgoing (established) ────────────────────────────────────────

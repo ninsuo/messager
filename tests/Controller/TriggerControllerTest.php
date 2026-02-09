@@ -49,10 +49,9 @@ class TriggerControllerTest extends WebTestCase
             'trigger_create_form[phones]' => "+33611200001\n+33611200002",
         ]);
 
-        $this->assertResponseRedirects('/');
-
         $triggers = self::getContainer()->get(TriggerRepository::class)->findByUser($user);
         $this->assertCount(1, $triggers);
+        $this->assertResponseRedirects('/trigger/' . $triggers[0]->getUuid());
         $this->assertSame(Trigger::TYPE_SMS, $triggers[0]->getType());
         $this->assertCount(2, $triggers[0]->getContacts());
     }
@@ -89,10 +88,9 @@ class TriggerControllerTest extends WebTestCase
 
         $client->submit($form);
 
-        $this->assertResponseRedirects('/');
-
         $triggers = self::getContainer()->get(TriggerRepository::class)->findByUser($user);
         $this->assertCount(1, $triggers);
+        $this->assertResponseRedirects('/trigger/' . $triggers[0]->getUuid());
         $this->assertCount(2, $triggers[0]->getContacts());
     }
 
@@ -112,7 +110,8 @@ class TriggerControllerTest extends WebTestCase
             'trigger_create_form[bookName]' => 'Mon nouveau répertoire',
         ]);
 
-        $this->assertResponseRedirects('/');
+        $triggers = self::getContainer()->get(TriggerRepository::class)->findByUser($user);
+        $this->assertResponseRedirects('/trigger/' . $triggers[0]->getUuid());
 
         $book = self::getContainer()->get(BookRepository::class)
             ->findOneBy(['name' => 'Mon nouveau répertoire']);
@@ -174,10 +173,9 @@ class TriggerControllerTest extends WebTestCase
             'trigger_create_form[phones]' => '+33611200008',
         ]);
 
-        $this->assertResponseRedirects('/');
-
         $triggers = self::getContainer()->get(TriggerRepository::class)->findByUser($user);
         $this->assertCount(1, $triggers);
+        $this->assertResponseRedirects('/trigger/' . $triggers[0]->getUuid());
         $this->assertSame(
             $existing->getUuid(),
             $triggers[0]->getContacts()->first()->getUuid()
@@ -198,10 +196,9 @@ class TriggerControllerTest extends WebTestCase
             'trigger_create_form[phones]' => '+33611200009',
         ]);
 
-        $this->assertResponseRedirects('/');
-
         $triggers = self::getContainer()->get(TriggerRepository::class)->findByUser($user);
         $this->assertCount(1, $triggers);
+        $this->assertResponseRedirects('/trigger/' . $triggers[0]->getUuid());
         $this->assertSame(Trigger::TYPE_CALL, $triggers[0]->getType());
     }
 
@@ -219,10 +216,9 @@ class TriggerControllerTest extends WebTestCase
             'trigger_create_form[phones]' => "+33611200010\n+33611200010",
         ]);
 
-        $this->assertResponseRedirects('/');
-
         $triggers = self::getContainer()->get(TriggerRepository::class)->findByUser($user);
         $this->assertCount(1, $triggers);
+        $this->assertResponseRedirects('/trigger/' . $triggers[0]->getUuid());
         $this->assertCount(1, $triggers[0]->getContacts());
     }
 }

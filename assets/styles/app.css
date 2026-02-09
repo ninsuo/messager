@@ -335,6 +335,11 @@ body {
     color: var(--ms-text-muted);
 }
 
+.trigger-detail-link {
+    align-self: center;
+    flex-shrink: 0;
+}
+
 /* Form sections */
 .form-section {
     background: var(--ms-card-bg);

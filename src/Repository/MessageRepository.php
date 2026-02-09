@@ -90,6 +90,31 @@ class MessageRepository extends ServiceEntityRepository
         return $counts;
     }
 
+    /**
+     * @return Message[]
+     */
+    public function findByTrigger(Trigger $trigger): array
+    {
+        return $this->createQueryBuilder('m')
+            ->join('m.contact', 'c')
+            ->addSelect('c')
+            ->where('m.trigger = :trigger')
+            ->setParameter('trigger', $trigger)
+            ->orderBy('m.createdAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function removeByTrigger(Trigger $trigger): void
+    {
+        $this->createQueryBuilder('m')
+            ->delete()
+            ->where('m.trigger = :trigger')
+            ->setParameter('trigger', $trigger)
+            ->getQuery()
+            ->execute();
+    }
+
     public function findLatestByContact(Contact $contact, \DateTimeInterface $since): ?Message
     {
         return $this->createQueryBuilder('m')

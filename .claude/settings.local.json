@@ -15,7 +15,8 @@
       "Bash(make:*)",
       "Bash(git mv:*)",
       "Bash(xargs:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(ls:*)"
     ]
   }
 }

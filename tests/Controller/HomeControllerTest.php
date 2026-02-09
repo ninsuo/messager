@@ -243,4 +243,161 @@ class HomeControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertCount(1, $crawler->filter('.trigger-progress'));
     }
+
+    public function testHomePageShowsDetailLink(): void
+    {
+        $client = static::createClient();
+
+        $user = $this->createUser('+33600000085');
+        $trigger = $this->createTrigger($user, Trigger::TYPE_SMS, 'Detail link test');
+
+        $client->loginUser($user);
+        $crawler = $client->request('GET', '/');
+
+        $link = $crawler->filter('.trigger-detail-link');
+        $this->assertCount(1, $link);
+        $this->assertSame('/trigger/' . $trigger->getUuid(), $link->attr('href'));
+    }
+
+    public function testTriggerDetailReturns200ForOwner(): void
+    {
+        $client = static::createClient();
+
+        $user = $this->createUser('+33600000086');
+        $contact = $this->createContact('+33611000086');
+        $trigger = $this->createTrigger($user, Trigger::TYPE_SMS, 'Detail page test');
+        $message = $this->createMessage($trigger, $contact);
+        $message->setStatus(Message::STATUS_DELIVERED);
+        self::getContainer()->get(\App\Repository\MessageRepository::class)->save($message);
+
+        $client->loginUser($user);
+        $crawler = $client->request('GET', '/trigger/' . $trigger->getUuid());
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('h1', 'Détails');
+        $this->assertCount(1, $crawler->filter('.trigger-progress'));
+        $this->assertCount(1, $crawler->filter('table.admin-table'));
+        $this->assertCount(1, $crawler->filter('.badge.bg-success'));
+    }
+
+    public function testTriggerDetailReturns403ForNonOwner(): void
+    {
+        $client = static::createClient();
+
+        $owner = $this->createUser('+33600000087');
+        $otherUser = $this->createUser('+33600000088');
+        $trigger = $this->createTrigger($owner, Trigger::TYPE_SMS, 'Not yours');
+
+        $client->loginUser($otherUser);
+        $client->request('GET', '/trigger/' . $trigger->getUuid());
+
+        $this->assertResponseStatusCodeSame(403);
+    }
+
+    public function testTriggerDetailShowsMessages(): void
+    {
+        $client = static::createClient();
+
+        $user = $this->createUser('+33600000089');
+        $contact1 = $this->createContact('+33611000089');
+        $contact2 = $this->createContact('+33611000090');
+        $trigger = $this->createTrigger($user, Trigger::TYPE_SMS, 'Multi message detail');
+
+        $m1 = $this->createMessage($trigger, $contact1);
+        $m1->setStatus(Message::STATUS_SENT);
+        self::getContainer()->get(\App\Repository\MessageRepository::class)->save($m1);
+
+        $m2 = $this->createMessage($trigger, $contact2);
+        $m2->setStatus(Message::STATUS_FAILED);
+        $m2->setError('Unreachable');
+        self::getContainer()->get(\App\Repository\MessageRepository::class)->save($m2);
+
+        $client->loginUser($user);
+        $crawler = $client->request('GET', '/trigger/' . $trigger->getUuid());
+
+        $this->assertResponseIsSuccessful();
+        $rows = $crawler->filter('table.admin-table tbody tr');
+        $this->assertCount(2, $rows);
+        $this->assertStringContainsString('Unreachable', $crawler->filter('table.admin-table')->text());
+    }
+
+    public function testTriggerMessagesEndpointReturns200ForOwner(): void
+    {
+        $client = static::createClient();
+
+        $user = $this->createUser('+33600000091');
+        $contact = $this->createContact('+33611000091');
+        $trigger = $this->createTrigger($user, Trigger::TYPE_SMS, 'Messages endpoint');
+        $this->createMessage($trigger, $contact);
+
+        $client->loginUser($user);
+        $crawler = $client->request('GET', '/trigger/' . $trigger->getUuid() . '/messages');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(1, $crawler->filter('table.admin-table'));
+    }
+
+    public function testTriggerMessagesEndpointReturns403ForNonOwner(): void
+    {
+        $client = static::createClient();
+
+        $owner = $this->createUser('+33600000092');
+        $otherUser = $this->createUser('+33600000093');
+        $trigger = $this->createTrigger($owner, Trigger::TYPE_SMS, 'Not yours messages');
+
+        $client->loginUser($otherUser);
+        $client->request('GET', '/trigger/' . $trigger->getUuid() . '/messages');
+
+        $this->assertResponseStatusCodeSame(403);
+    }
+
+    public function testTriggerDeleteRemovesTriggerAndMessages(): void
+    {
+        $client = static::createClient();
+
+        $user = $this->createUser('+33600000094');
+        $contact = $this->createContact('+33611000094');
+        $trigger = $this->createTrigger($user, Trigger::TYPE_SMS, 'To be deleted');
+        $this->createMessage($trigger, $contact);
+
+        $client->loginUser($user);
+        $client->request('POST', '/trigger/' . $trigger->getUuid() . '/delete');
+
+        $this->assertResponseRedirects('/');
+        $client->followRedirect();
+        $this->assertSelectorTextContains('.alert-success', 'supprimé');
+
+        $triggerRepository = self::getContainer()->get(\App\Repository\TriggerRepository::class);
+        $this->assertEmpty($triggerRepository->findByUser($user));
+    }
+
+    public function testTriggerDeleteReturns403ForNonOwner(): void
+    {
+        $client = static::createClient();
+
+        $owner = $this->createUser('+33600000095');
+        $otherUser = $this->createUser('+33600000096');
+        $trigger = $this->createTrigger($owner, Trigger::TYPE_SMS, 'Not yours to delete');
+
+        $client->loginUser($otherUser);
+        $client->request('POST', '/trigger/' . $trigger->getUuid() . '/delete');
+
+        $this->assertResponseStatusCodeSame(403);
+    }
+
+    public function testTriggerDetailShowsDeleteButton(): void
+    {
+        $client = static::createClient();
+
+        $user = $this->createUser('+33600000097');
+        $trigger = $this->createTrigger($user, Trigger::TYPE_SMS, 'Has delete button');
+
+        $client->loginUser($user);
+        $crawler = $client->request('GET', '/trigger/' . $trigger->getUuid());
+
+        $this->assertResponseIsSuccessful();
+        $deleteButton = $crawler->filter('form[action$="/delete"] button[type="submit"]');
+        $this->assertCount(1, $deleteButton);
+        $this->assertStringContainsString('Supprimer', $deleteButton->text());
+    }
 }
