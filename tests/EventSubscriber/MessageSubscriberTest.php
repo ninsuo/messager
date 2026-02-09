@@ -94,6 +94,11 @@ class MessageSubscriberTest extends KernelTestCase
         $xml = $response->asXML();
         $this->assertStringContainsString('Alerte recente.', $xml);
         $this->assertStringContainsString('fr-FR', $xml);
+        $this->assertStringContainsString('Polly.Lea', $xml);
+        $this->assertStringContainsString('Polly.Mathieu', $xml);
+        $this->assertSame(4, substr_count($xml, 'Je répète.'));
+        $this->assertSame(5, substr_count($xml, 'Alerte recente.'));
+        $this->assertStringContainsString('<Pause length="2"/>', $xml);
 
         // Context should be set so events can reference the message
         $context = $call->getContext();
@@ -177,6 +182,11 @@ class MessageSubscriberTest extends KernelTestCase
         $this->assertStringContainsString('Alerte de test.', $xml);
         $this->assertStringContainsString('fr-FR', $xml);
         $this->assertStringNotContainsString('Gather', $xml);
+        $this->assertStringContainsString('Polly.Lea', $xml);
+        $this->assertStringContainsString('Polly.Mathieu', $xml);
+        $this->assertSame(4, substr_count($xml, 'Je répète.'));
+        $this->assertSame(5, substr_count($xml, 'Alerte de test.'));
+        $this->assertStringContainsString('<Pause length="2"/>', $xml);
 
         $em = self::getContainer()->get(\Doctrine\ORM\EntityManagerInterface::class);
         $em->refresh($message);

@@ -90,9 +90,22 @@ class MessageSubscriber implements EventSubscriberInterface
         $content = $trigger?->getContent() ?? '';
 
         $response = new VoiceResponse();
-        $response->say($content, [
-            'language' => 'fr-FR',
-        ]);
+
+        for ($i = 0; $i < 5; $i++) {
+            $response->say($content, [
+                'language' => 'fr-FR',
+                'voice' => 'Polly.Lea',
+            ]);
+
+            if ($i < 4) {
+                $response->pause(['length' => 2]);
+                $response->say('Je répète.', [
+                    'language' => 'fr-FR',
+                    'voice' => 'Polly.Mathieu',
+                ]);
+                $response->pause(['length' => 2]);
+            }
+        }
 
         $message->setStatus(Message::STATUS_DELIVERED);
         $this->entityManager->flush();

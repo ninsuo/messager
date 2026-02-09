@@ -8,12 +8,14 @@ use PHPUnit\Framework\TestCase;
 
 class LinkMobilityCallProviderTest extends TestCase
 {
-    public function testSendDelegatesToClientWithVoiceServiceIdAndContent(): void
+    public function testSendDelegatesToClientWithRepeatedContent(): void
     {
+        $expected = implode('. Je répète. ', array_fill(0, 5, 'Voice message content'));
+
         $client = $this->createMock(LinkMobilityClient::class);
         $client->expects($this->once())
             ->method('send')
-            ->with('+33612345678', 'Voice message content', 99)
+            ->with('+33612345678', $expected, 99)
             ->willReturn(['msg_id' => 'voice-456']);
 
         $provider = new LinkMobilityCallProvider($client, 99);
@@ -23,12 +25,14 @@ class LinkMobilityCallProviderTest extends TestCase
         $this->assertSame('voice-456', $result);
     }
 
-    public function testSendWithNullContentSendsEmptyString(): void
+    public function testSendWithNullContentRepeatsEmptyString(): void
     {
+        $expected = implode('. Je répète. ', array_fill(0, 5, ''));
+
         $client = $this->createMock(LinkMobilityClient::class);
         $client->expects($this->once())
             ->method('send')
-            ->with('+33612345678', '', 99)
+            ->with('+33612345678', $expected, 99)
             ->willReturn(['msg_id' => 'voice-789']);
 
         $provider = new LinkMobilityCallProvider($client, 99);

@@ -47,7 +47,10 @@ RUN chown -R www-data:www-data /var/www
 WORKDIR /var/www
 USER www-data
 
+# Build assets inside the container so hashes are consistent with the server environment
 RUN composer install --optimize-autoloader --no-scripts \
+    && php bin/console importmap:install \
+    && php bin/console asset-map:compile \
     && bin/console cache:warmup
 
 ENTRYPOINT ["php-fpm"]

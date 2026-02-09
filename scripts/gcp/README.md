@@ -66,7 +66,7 @@ Syncs code, builds containers, and runs migrations.
 
 ```bash
 ssh messager-group-xxxx.europe-west9-a.<project-id>
-docker exec -ti messager-php-1 php bin/console user:create <your phone number> --admin
+sudo docker exec -ti messager-php-1 php bin/console user:create <your phone number> --admin
 ```
 
 ### 5. Cleanup (Destroy)

@@ -26,14 +26,15 @@ services:
 
   caddy:
     build:
-      context: ./docker/caddy
-      dockerfile: Dockerfile.prod
+      context: .
+      dockerfile: docker/caddy/Dockerfile.prod
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - caddy_data:/data
       - caddy_config:/config
+      - asset_data:/var/www/public/assets
     deploy:
       restart_policy:
         condition: any
@@ -43,6 +44,8 @@ services:
       context: .
       dockerfile: docker/php/Dockerfile.prod
       target: base
+    volumes:
+      - asset_data:/var/www/public/assets
     deploy:
       restart_policy:
         condition: any
@@ -83,3 +86,4 @@ services:
 volumes:
   caddy_data:
   caddy_config:
+  asset_data:

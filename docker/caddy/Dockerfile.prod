@@ -1,6 +1,10 @@
 FROM caddy:2
 
-COPY Caddyfile.prod /etc/caddy/Caddyfile
+# Note: Context is project root
+COPY docker/caddy/Caddyfile.prod /etc/caddy/Caddyfile
+COPY public /var/www/public
+COPY assets /var/www/assets
+COPY vendor /var/www/vendor
 
 WORKDIR /var/www
 
