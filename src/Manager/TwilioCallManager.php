@@ -9,10 +9,8 @@ use App\Repository\TwilioCallRepository;
 use App\Service\TwilioClient;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twilio\TwiML\VoiceResponse;
@@ -25,9 +23,6 @@ class TwilioCallManager
         private readonly TwilioCallRepository $callRepository,
         private readonly TwilioClient $twilio,
         private readonly EventDispatcherInterface $eventDispatcher,
-        private readonly RouterInterface $router,
-        #[Autowire(env: 'WEBSITE_URL')]
-        private readonly string $websiteUrl,
         ?LoggerInterface $logger = null,
     ) {
         $this->logger = $logger ?? new NullLogger();
@@ -84,7 +79,6 @@ class TwilioCallManager
     public function sendCall(
         string $from,
         string $to,
-        bool $handleAnsweringMachines = false,
         array $context = [],
     ): TwilioCall {
         $entity = new TwilioCall();
@@ -106,16 +100,6 @@ class TwilioCallManager
                 $options['Twiml'] = $response->asXML();
             } else {
                 throw new \LogicException('Can\'t establish call, no responses were provided.');
-            }
-
-            if ($handleAnsweringMachines) {
-                $options['MachineDetection'] = 'Enable';
-                $options['AsyncAMD'] = true;
-                $options['AsyncAmdStatusCallback'] = sprintf(
-                    '%s%s',
-                    rtrim($this->websiteUrl, '/'),
-                    $this->router->generate('twilio_answering_machine', ['uuid' => $entity->getUuid()]),
-                );
             }
 
             $outbound = $this->twilio->createCall($to, $from, $options);
@@ -185,5 +169,4 @@ class TwilioCallManager
             $call->setMessage($response->getTargetUrl());
         }
     }
-
 }

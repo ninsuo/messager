@@ -9,7 +9,7 @@ Symfony 8 / PHP 8.4 messaging application using Twilio for SMS and voice calls.
 - **Runtime:** PHP 8.4, Symfony 8.0, Doctrine ORM 3.x
 - **Database:** MySQL 8.0 (utf8mb4), accessed via `DATABASE_URL` env var
 - **Web server:** Caddy (dev: HTTP on :80, prod: HTTPS via Let's Encrypt on www.messager.org)
-- **External API:** Twilio SDK 8.x (`twilio/sdk`) — env vars: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `WEBSITE_URL`
+- **External API:** Twilio SDK 8.x (`twilio/sdk`) — env vars: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`
 - **Frontend:** Asset Mapper (not Webpack), Bootstrap 5.3, Stimulus 3.2, Turbo 7.3
 
 ## Docker

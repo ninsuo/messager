@@ -9,7 +9,6 @@ use App\Entity\TwilioMessage;
 use App\Event\TwilioCallEvent;
 use App\Event\TwilioEvent;
 use App\Event\TwilioMessageEvent;
-use App\Repository\FakeSmsRepository;
 use App\Tests\Trait\EntityFactoryTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Uid\Uuid;
@@ -95,11 +94,15 @@ class MessageSubscriberTest extends KernelTestCase
         $xml = $response->asXML();
         $this->assertStringContainsString('Alerte recente.', $xml);
         $this->assertStringContainsString('fr-FR', $xml);
-        $this->assertStringContainsString('Gather', $xml);
 
-        // Context should be set so key-press events can reference the message
+        // Context should be set so events can reference the message
         $context = $call->getContext();
         $this->assertSame($message->getUuid(), $context['message_uuid']);
+
+        // Message should be marked as delivered
+        $em = self::getContainer()->get(\Doctrine\ORM\EntityManagerInterface::class);
+        $em->refresh($message);
+        $this->assertSame(Message::STATUS_DELIVERED, $message->getStatus());
     }
 
     public function testCallReceivedWithNoRecentMessagePlaysError(): void
@@ -149,7 +152,7 @@ class MessageSubscriberTest extends KernelTestCase
         $this->assertStringContainsString('aucun déclenchement actif', $xml);
     }
 
-    public function testCallEstablishedReturnsVoiceResponse(): void
+    public function testCallEstablishedPlaysContentAndMarksDelivered(): void
     {
         $user = $this->createUser('+33600500002');
         $contact = $this->createContact('+33611500003');
@@ -173,58 +176,7 @@ class MessageSubscriberTest extends KernelTestCase
         $xml = $response->asXML();
         $this->assertStringContainsString('Alerte de test.', $xml);
         $this->assertStringContainsString('fr-FR', $xml);
-        $this->assertStringContainsString('Gather', $xml);
-    }
-
-    public function testCallKeyPressedZeroRepeatsMessage(): void
-    {
-        $user = $this->createUser('+33600500003');
-        $contact = $this->createContact('+33611500004');
-        $trigger = $this->createTrigger($user, Trigger::TYPE_CALL, 'Message a repeter.');
-        $trigger->addContact($contact);
-        $message = $this->createMessage($trigger, $contact);
-
-        $call = new TwilioCall();
-        $call->setUuid(Uuid::v4()->toRfc4122());
-        $call->setDirection(TwilioCall::DIRECTION_OUTBOUND);
-        $call->setFromNumber('+33700000000');
-        $call->setToNumber('+33611500004');
-        $call->setContext(['message_uuid' => $message->getUuid()]);
-
-        $event = new TwilioCallEvent($call, '0');
-        $this->eventDispatcher->dispatch($event, TwilioEvent::CALL_KEY_PRESSED);
-
-        $response = $event->getResponse();
-        $this->assertInstanceOf(VoiceResponse::class, $response);
-
-        $xml = $response->asXML();
-        $this->assertStringContainsString('Message a repeter.', $xml);
-        $this->assertStringContainsString('Gather', $xml);
-    }
-
-    public function testCallKeyPressedOtherKeyMarksDelivered(): void
-    {
-        $user = $this->createUser('+33600500004');
-        $contact = $this->createContact('+33611500005');
-        $trigger = $this->createTrigger($user, Trigger::TYPE_CALL, 'Test delivered.');
-        $trigger->addContact($contact);
-        $message = $this->createMessage($trigger, $contact);
-
-        $call = new TwilioCall();
-        $call->setUuid(Uuid::v4()->toRfc4122());
-        $call->setDirection(TwilioCall::DIRECTION_OUTBOUND);
-        $call->setFromNumber('+33700000000');
-        $call->setToNumber('+33611500005');
-        $call->setContext(['message_uuid' => $message->getUuid()]);
-
-        $event = new TwilioCallEvent($call, '1');
-        $this->eventDispatcher->dispatch($event, TwilioEvent::CALL_KEY_PRESSED);
-
-        $response = $event->getResponse();
-        $this->assertInstanceOf(VoiceResponse::class, $response);
-
-        $xml = $response->asXML();
-        $this->assertStringContainsString('Bonne journée', $xml);
+        $this->assertStringNotContainsString('Gather', $xml);
 
         $em = self::getContainer()->get(\Doctrine\ORM\EntityManagerInterface::class);
         $em->refresh($message);
@@ -256,121 +208,5 @@ class MessageSubscriberTest extends KernelTestCase
 
         $this->assertSame(Message::STATUS_FAILED, $message->getStatus());
         $this->assertSame('Call failed: busy', $message->getError());
-    }
-
-    public function testCallAnsweringMachineFallsBackToSms(): void
-    {
-        $user = $this->createUser('+33600500006');
-        $contact = $this->createContact('+33611500007');
-        $trigger = $this->createTrigger($user, Trigger::TYPE_CALL, 'Message vocal test.');
-        $trigger->addContact($contact);
-        $message = $this->createMessage($trigger, $contact);
-
-        $smsCountBefore = count(
-            self::getContainer()->get(FakeSmsRepository::class)->findAll()
-        );
-
-        $call = new TwilioCall();
-        $call->setUuid(Uuid::v4()->toRfc4122());
-        $call->setDirection(TwilioCall::DIRECTION_OUTBOUND);
-        $call->setFromNumber('+33700000000');
-        $call->setToNumber('+33611500007');
-        $call->setContext(['message_uuid' => $message->getUuid()]);
-
-        $event = new TwilioCallEvent($call);
-        $this->eventDispatcher->dispatch($event, TwilioEvent::CALL_ANSWERING_MACHINE);
-
-        $smsCountAfter = count(
-            self::getContainer()->get(FakeSmsRepository::class)->findAll()
-        );
-
-        $this->assertSame($smsCountBefore + 1, $smsCountAfter);
-
-        // Check the SMS was sent with the right content
-        $sms = self::getContainer()->get(FakeSmsRepository::class)->findOneBy([
-            'toNumber' => '+33611500007',
-        ]);
-        $this->assertNotNull($sms);
-        $this->assertSame('Message vocal test.', $sms->getMessage());
-    }
-
-    public function testCallAnsweringMachineSkipsSmsForBothTrigger(): void
-    {
-        $user = $this->createUser('+33600500020');
-        $contact = $this->createContact('+33611500020');
-        $trigger = $this->createTrigger($user, Trigger::TYPE_BOTH, 'Message both test.');
-        $trigger->addContact($contact);
-        $message = $this->createMessage($trigger, $contact);
-
-        $smsCountBefore = count(
-            self::getContainer()->get(FakeSmsRepository::class)->findAll()
-        );
-
-        $call = new TwilioCall();
-        $call->setUuid(Uuid::v4()->toRfc4122());
-        $call->setDirection(TwilioCall::DIRECTION_OUTBOUND);
-        $call->setFromNumber('+33700000000');
-        $call->setToNumber('+33611500020');
-        $call->setContext(['message_uuid' => $message->getUuid()]);
-
-        $event = new TwilioCallEvent($call);
-        $this->eventDispatcher->dispatch($event, TwilioEvent::CALL_ANSWERING_MACHINE);
-
-        $smsCountAfter = count(
-            self::getContainer()->get(FakeSmsRepository::class)->findAll()
-        );
-
-        $this->assertSame($smsCountBefore, $smsCountAfter, 'BOTH trigger should NOT fall back to SMS on answering machine');
-    }
-
-    public function testCallAnsweringMachineStillFallsBackForCallTrigger(): void
-    {
-        $user = $this->createUser('+33600500021');
-        $contact = $this->createContact('+33611500021');
-        $trigger = $this->createTrigger($user, Trigger::TYPE_CALL, 'Call only test.');
-        $trigger->addContact($contact);
-        $message = $this->createMessage($trigger, $contact);
-
-        $smsCountBefore = count(
-            self::getContainer()->get(FakeSmsRepository::class)->findAll()
-        );
-
-        $call = new TwilioCall();
-        $call->setUuid(Uuid::v4()->toRfc4122());
-        $call->setDirection(TwilioCall::DIRECTION_OUTBOUND);
-        $call->setFromNumber('+33700000000');
-        $call->setToNumber('+33611500021');
-        $call->setContext(['message_uuid' => $message->getUuid()]);
-
-        $event = new TwilioCallEvent($call);
-        $this->eventDispatcher->dispatch($event, TwilioEvent::CALL_ANSWERING_MACHINE);
-
-        $smsCountAfter = count(
-            self::getContainer()->get(FakeSmsRepository::class)->findAll()
-        );
-
-        $this->assertSame($smsCountBefore + 1, $smsCountAfter, 'CALL trigger should still fall back to SMS on answering machine');
-    }
-
-    public function testCallAnsweringMachineWithoutContextIsIgnored(): void
-    {
-        $call = new TwilioCall();
-        $call->setUuid(Uuid::v4()->toRfc4122());
-        $call->setDirection(TwilioCall::DIRECTION_OUTBOUND);
-        $call->setFromNumber('+33700000000');
-        $call->setToNumber('+33611500008');
-
-        $smsCountBefore = count(
-            self::getContainer()->get(FakeSmsRepository::class)->findAll()
-        );
-
-        $event = new TwilioCallEvent($call);
-        $this->eventDispatcher->dispatch($event, TwilioEvent::CALL_ANSWERING_MACHINE);
-
-        $smsCountAfter = count(
-            self::getContainer()->get(FakeSmsRepository::class)->findAll()
-        );
-
-        $this->assertSame($smsCountBefore, $smsCountAfter);
     }
 }

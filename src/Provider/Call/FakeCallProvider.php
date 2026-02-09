@@ -19,7 +19,7 @@ readonly class FakeCallProvider implements CallProvider
     ) {
     }
 
-    public function send(string $from, string $to, array $context = []): ?string
+    public function send(string $from, string $to, array $context = [], ?string $content = null): ?string
     {
         $this->triggerHook($from, $to, $context, TwilioEvent::CALL_ESTABLISHED, FakeCall::TYPE_ESTABLISH);
 

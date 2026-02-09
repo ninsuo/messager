@@ -12,7 +12,6 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twilio\Rest\Api\V2010\Account\CallInstance;
 use Twilio\TwiML\VoiceResponse;
@@ -23,15 +22,12 @@ class TwilioCallManagerTest extends TestCase
         TwilioCallRepository $repository,
         TwilioClient $twilioClient,
         EventDispatcherInterface $eventDispatcher,
-        RouterInterface $router,
         ?LoggerInterface $logger = null,
     ): TwilioCallManager {
         return new TwilioCallManager(
             $repository,
             $twilioClient,
             $eventDispatcher,
-            $router,
-            'https://www.messager.org',
             $logger ?? new NullLogger(),
         );
     }
@@ -52,7 +48,6 @@ class TwilioCallManagerTest extends TestCase
             $repository,
             $this->createStub(TwilioClient::class),
             $this->createStub(EventDispatcherInterface::class),
-            $this->createStub(RouterInterface::class),
         );
 
         $this->assertSame($entity, $manager->get('some-uuid'));
@@ -71,7 +66,6 @@ class TwilioCallManagerTest extends TestCase
             $repository,
             $this->createStub(TwilioClient::class),
             $this->createStub(EventDispatcherInterface::class),
-            $this->createStub(RouterInterface::class),
         );
 
         $this->assertNull($manager->get('unknown'));
@@ -91,7 +85,6 @@ class TwilioCallManagerTest extends TestCase
             $repository,
             $this->createStub(TwilioClient::class),
             $this->createStub(EventDispatcherInterface::class),
-            $this->createStub(RouterInterface::class),
         );
 
         $this->assertSame($entity, $manager->getBySid('CA123'));
@@ -110,7 +103,6 @@ class TwilioCallManagerTest extends TestCase
             $repository,
             $this->createStub(TwilioClient::class),
             $this->createStub(EventDispatcherInterface::class),
-            $this->createStub(RouterInterface::class),
         );
 
         $manager->save($entity);
@@ -157,7 +149,6 @@ class TwilioCallManagerTest extends TestCase
             $repository,
             $this->createStub(TwilioClient::class),
             $eventDispatcher,
-            $this->createStub(RouterInterface::class),
         );
 
         $response = $manager->handleIncomingCall($parameters);
@@ -206,7 +197,6 @@ class TwilioCallManagerTest extends TestCase
             $repository,
             $this->createStub(TwilioClient::class),
             $eventDispatcher,
-            $this->createStub(RouterInterface::class),
         );
 
         $response = $manager->handleIncomingCall($parameters);
@@ -239,7 +229,6 @@ class TwilioCallManagerTest extends TestCase
             $this->createStub(TwilioCallRepository::class),
             $this->createStub(TwilioClient::class),
             $eventDispatcher,
-            $this->createStub(RouterInterface::class),
         );
 
         $response = $manager->handleIncomingCall($parameters);
@@ -299,7 +288,7 @@ class TwilioCallManagerTest extends TestCase
                     && $entity->getStatus() === 'queued';
             }));
 
-        $manager = $this->createManager($repository, $twilioClient, $eventDispatcher, $this->createStub(RouterInterface::class));
+        $manager = $this->createManager($repository, $twilioClient, $eventDispatcher);
 
         $entity = $manager->sendCall('+33612345678', '+33698765432');
 
@@ -345,7 +334,6 @@ class TwilioCallManagerTest extends TestCase
             $this->createStub(TwilioCallRepository::class),
             $twilioClient,
             $eventDispatcher,
-            $this->createStub(RouterInterface::class),
         );
 
         $entity = $manager->sendCall('+33612345678', '+33698765432');
@@ -376,106 +364,12 @@ class TwilioCallManagerTest extends TestCase
             $this->createStub(TwilioCallRepository::class),
             $twilioClient,
             $eventDispatcher,
-            $this->createStub(RouterInterface::class),
         );
 
         $context = ['campaign' => 'emergency', 'priority' => 1];
-        $entity = $manager->sendCall('+33600000000', '+33611111111', false, $context);
+        $entity = $manager->sendCall('+33600000000', '+33611111111', $context);
 
         $this->assertSame($context, $entity->getContext());
-    }
-
-    public function testSendCallWithAnsweringMachineDetection(): void
-    {
-        $voiceResponse = new VoiceResponse();
-        $voiceResponse->say('AMD test');
-
-        $eventDispatcher = $this->createStub(EventDispatcherInterface::class);
-        $eventDispatcher->method('dispatch')->willReturnCallback(function (TwilioCallEvent $event) use ($voiceResponse) {
-            $event->setResponse($voiceResponse);
-
-            return $event;
-        });
-
-        $callInstance = $this->createStub(CallInstance::class);
-        $callInstance->sid = 'CA_AMD';
-        $callInstance->status = 'queued';
-
-        $router = $this->createMock(RouterInterface::class);
-        $router
-            ->expects($this->once())
-            ->method('generate')
-            ->with('twilio_answering_machine', $this->callback(fn (array $params) => isset($params['uuid'])))
-            ->willReturn('/twilio/answering-machine/some-uuid');
-
-        $twilioClient = $this->createMock(TwilioClient::class);
-        $twilioClient
-            ->expects($this->once())
-            ->method('createCall')
-            ->with(
-                '+33698765432',
-                '+33612345678',
-                $this->callback(function (array $opts) {
-                    return $opts['MachineDetection'] === 'Enable'
-                        && $opts['AsyncAMD'] === true
-                        && $opts['AsyncAmdStatusCallback'] === 'https://www.messager.org/twilio/answering-machine/some-uuid';
-                }),
-            )
-            ->willReturn($callInstance);
-
-        $manager = $this->createManager(
-            $this->createStub(TwilioCallRepository::class),
-            $twilioClient,
-            $eventDispatcher,
-            $router,
-        );
-
-        $entity = $manager->sendCall('+33612345678', '+33698765432', true);
-
-        $this->assertSame('CA_AMD', $entity->getSid());
-    }
-
-    public function testSendCallWithoutAnsweringMachineDetection(): void
-    {
-        $voiceResponse = new VoiceResponse();
-        $voiceResponse->say('No AMD');
-
-        $eventDispatcher = $this->createStub(EventDispatcherInterface::class);
-        $eventDispatcher->method('dispatch')->willReturnCallback(function (TwilioCallEvent $event) use ($voiceResponse) {
-            $event->setResponse($voiceResponse);
-
-            return $event;
-        });
-
-        $callInstance = $this->createStub(CallInstance::class);
-        $callInstance->sid = 'CA_NO_AMD';
-        $callInstance->status = 'queued';
-
-        $router = $this->createMock(RouterInterface::class);
-        $router->expects($this->never())->method('generate');
-
-        $twilioClient = $this->createMock(TwilioClient::class);
-        $twilioClient
-            ->expects($this->once())
-            ->method('createCall')
-            ->with(
-                $this->anything(),
-                $this->anything(),
-                $this->callback(function (array $opts) {
-                    return !isset($opts['MachineDetection'])
-                        && !isset($opts['AsyncAMD']);
-                }),
-            )
-            ->willReturn($callInstance);
-
-        $manager = $this->createManager(
-            $this->createStub(TwilioCallRepository::class),
-            $twilioClient,
-            $eventDispatcher,
-            $router,
-        );
-
-        $manager->sendCall('+33612345678', '+33698765432', false);
     }
 
     public function testSendCallNoResponseThrows(): void
@@ -506,7 +400,6 @@ class TwilioCallManagerTest extends TestCase
             $this->createStub(TwilioCallRepository::class),
             $this->createStub(TwilioClient::class),
             $eventDispatcher,
-            $this->createStub(RouterInterface::class),
             $logger,
         );
 
@@ -562,7 +455,7 @@ class TwilioCallManagerTest extends TestCase
                     && $entity->getError() === 'Twilio API error';
             }));
 
-        $manager = $this->createManager($repository, $twilioClient, $eventDispatcher, $this->createStub(RouterInterface::class), $logger);
+        $manager = $this->createManager($repository, $twilioClient, $eventDispatcher, $logger);
 
         $entity = $manager->sendCall('+33612345678', '+33698765432');
 
@@ -586,7 +479,6 @@ class TwilioCallManagerTest extends TestCase
             $repository,
             $this->createStub(TwilioClient::class),
             $eventDispatcher,
-            $this->createStub(RouterInterface::class),
         );
 
         $manager->sendCall('+33600000000', '+33611111111');
@@ -626,7 +518,6 @@ class TwilioCallManagerTest extends TestCase
             $repository,
             $this->createStub(TwilioClient::class),
             $eventDispatcher,
-            $this->createStub(RouterInterface::class),
         );
 
         $response = $manager->handleCallEstablished($call);
@@ -659,7 +550,6 @@ class TwilioCallManagerTest extends TestCase
             $repository,
             $this->createStub(TwilioClient::class),
             $eventDispatcher,
-            $this->createStub(RouterInterface::class),
         );
 
         $response = $manager->handleCallEstablished($call);
@@ -686,7 +576,6 @@ class TwilioCallManagerTest extends TestCase
             $repository,
             $this->createStub(TwilioClient::class),
             $eventDispatcher,
-            $this->createStub(RouterInterface::class),
         );
 
         $response = $manager->handleCallEstablished($call);
@@ -728,7 +617,6 @@ class TwilioCallManagerTest extends TestCase
             $repository,
             $this->createStub(TwilioClient::class),
             $eventDispatcher,
-            $this->createStub(RouterInterface::class),
         );
 
         $response = $manager->handleKeyPressed($call, '1');
@@ -755,7 +643,6 @@ class TwilioCallManagerTest extends TestCase
             $repository,
             $this->createStub(TwilioClient::class),
             $eventDispatcher,
-            $this->createStub(RouterInterface::class),
         );
 
         $response = $manager->handleKeyPressed($call, '5');
@@ -787,7 +674,6 @@ class TwilioCallManagerTest extends TestCase
             $repository,
             $this->createStub(TwilioClient::class),
             $eventDispatcher,
-            $this->createStub(RouterInterface::class),
         );
 
         $manager->handleAnsweringMachine($call);

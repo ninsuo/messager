@@ -24,7 +24,7 @@ class TwilioMessageManager
         private readonly TwilioClient $twilio,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly RouterInterface $router,
-        #[Autowire(env: 'WEBSITE_URL')]
+        #[Autowire(env: 'DEFAULT_URI')]
         private readonly string $websiteUrl,
         ?LoggerInterface $logger = null,
     ) {

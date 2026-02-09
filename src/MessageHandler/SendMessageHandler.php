@@ -69,6 +69,7 @@ class SendMessageHandler
                     $this->fromNumber,
                     $toNumber,
                     $context,
+                    $trigger->getContent(),
                 );
             } else {
                 throw new \RuntimeException('Unsupported message type: ' . $messageType);

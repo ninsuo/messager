@@ -16,7 +16,12 @@
       "Bash(git mv:*)",
       "Bash(xargs:*)",
       "Bash(grep:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "WebSearch",
+      "WebFetch(domain:www.linkmobility.com)",
+      "WebFetch(domain:developer.linkmobility.eu)",
+      "WebFetch(domain:linkmobility.atlassian.net)",
+      "WebFetch(domain:documentation.msghub.cloud)"
     ]
   }
 }

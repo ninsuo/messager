@@ -17,11 +17,14 @@ services:
         resource: '../src/'
 
     # Providers: production uses Twilio, dev uses fakes (see when@dev below)
+    # Switch to LINK Mobility by commenting Twilio aliases and uncommenting LINK ones.
     App\Provider\SMS\SmsProvider:
         alias: App\Provider\SMS\TwilioSmsProvider
+    #    alias: App\Provider\SMS\LinkMobilitySmsProvider
 
     App\Provider\Call\CallProvider:
         alias: App\Provider\Call\TwilioCallProvider
+    #    alias: App\Provider\Call\LinkMobilityCallProvider
 
 when@dev:
     services:
