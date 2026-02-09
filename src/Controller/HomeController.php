@@ -47,6 +47,12 @@ class HomeController extends AbstractController
         ]);
     }
 
+    #[Route('/aide', name: 'help', methods: ['GET'])]
+    public function help(): Response
+    {
+        return $this->render('home/help.html.twig');
+    }
+
     #[Route('/trigger/{uuid}/status', name: 'trigger_status', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function triggerStatus(

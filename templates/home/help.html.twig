@@ -1,0 +1,129 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Messager - Aide{% endblock %}
+
+{% block body %}
+    <div class="app-wrapper">
+        <div class="container" style="max-width: 720px;">
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ path('home') }}" class="btn btn-outline-secondary btn-sm me-3">&larr; Retour</a>
+                <h1 class="app-title mb-0">Aide</h1>
+            </div>
+
+            <div class="help-section mb-4">
+                <h2>Connexion</h2>
+                <p>
+                    Pour vous connecter, entrez votre numéro de téléphone sur la page d'accueil.
+                    Un code de vérification à 6 chiffres vous sera envoyé par SMS.
+                    Saisissez ce code pour accéder à votre compte.
+                </p>
+                <p>
+                    Les numéros sont acceptés sous différents formats :
+                    <code>06 12 34 56 78</code>, <code>0612345678</code>,
+                    <code>+33612345678</code>, <code>+33 6 12 34 56 78</code>, etc.
+                </p>
+            </div>
+
+            <div class="help-section mb-4">
+                <h2>Déclenchements</h2>
+                <p>
+                    Un déclenchement permet d'envoyer un message (SMS ou appel vocal) à un ou plusieurs contacts en une seule action.
+                </p>
+
+                <h3>Créer un déclenchement</h3>
+                <ol>
+                    <li>Cliquez sur le bouton <strong>Nouveau</strong> depuis la page d'accueil.</li>
+                    <li>
+                        <strong>Audience :</strong> sélectionnez une ou plusieurs listes de contacts,
+                        et/ou saisissez des numéros de téléphone manuellement (un par ligne).
+                    </li>
+                    <li>
+                        <strong>Type :</strong> choisissez <em>SMS</em> pour un message texte
+                        ou <em>Appel</em> pour un appel vocal automatisé.
+                    </li>
+                    <li><strong>Contenu :</strong> rédigez votre message.</li>
+                    <li>Cliquez sur <strong>Créer le déclenchement</strong>.</li>
+                </ol>
+                <p>
+                    Les messages sont envoyés de manière asynchrone. Vous serez redirigé vers la page
+                    de détails où vous pourrez suivre la progression en temps réel.
+                </p>
+
+                <h3>Suivi de la progression</h3>
+                <p>Chaque message passe par les statuts suivants :</p>
+                <ul>
+                    <li><span class="badge bg-secondary">En attente</span> — le message est en file d'attente</li>
+                    <li><span class="badge bg-primary">Envoyé</span> — le message a été transmis à l'opérateur</li>
+                    <li><span class="badge bg-success">Distribué</span> — le message a été reçu par le destinataire</li>
+                    <li><span class="badge bg-danger">Échoué</span> — l'envoi a échoué (numéro invalide, injoignable, etc.)</li>
+                </ul>
+                <p>
+                    La barre de progression se met à jour automatiquement tant que des messages sont en cours d'envoi.
+                </p>
+
+                <h3>Supprimer un déclenchement</h3>
+                <p>
+                    Depuis la page de détails d'un déclenchement, cliquez sur <strong>Supprimer</strong>
+                    pour supprimer le déclenchement et tous ses messages.
+                </p>
+            </div>
+
+            <div class="help-section mb-4">
+                <h2>Listes de contacts</h2>
+                <p>
+                    Les listes de contacts permettent de regrouper des numéros de téléphone pour les réutiliser
+                    facilement lors de la création de déclenchements.
+                </p>
+                <ul>
+                    <li>
+                        <strong>Créer une liste :</strong> lors de la création d'un déclenchement,
+                        cochez « Sauvegarder comme liste de contacts » et donnez-lui un nom.
+                    </li>
+                    <li>
+                        <strong>Modifier une liste :</strong> cliquez sur l'icône de modification
+                        à côté du nom de la liste dans le formulaire de déclenchement.
+                        Vous pouvez renommer la liste, ajouter ou retirer des contacts.
+                    </li>
+                    <li>
+                        <strong>Supprimer une liste :</strong> cliquez sur l'icône de suppression
+                        à côté du nom de la liste. Les contacts ne sont pas supprimés.
+                    </li>
+                </ul>
+            </div>
+
+            <div class="help-section mb-4">
+                <h2>Numéros de téléphone</h2>
+                <p>
+                    Les numéros de téléphone français sont acceptés sous de nombreux formats
+                    et sont automatiquement convertis au format international :
+                </p>
+                <ul>
+                    <li><code>06 12 34 56 78</code> &rarr; <code>+33612345678</code></li>
+                    <li><code>0612345678</code> &rarr; <code>+33612345678</code></li>
+                    <li><code>+33 6 12 34 56 78</code> &rarr; <code>+33612345678</code></li>
+                    <li><code>06.12.34.56.78</code> &rarr; <code>+33612345678</code></li>
+                    <li><code>06-12-34-56-78</code> &rarr; <code>+33612345678</code></li>
+                    <li><code>0033612345678</code> &rarr; <code>+33612345678</code></li>
+                </ul>
+            </div>
+
+            {% if app.user and is_granted('ROLE_ADMIN') %}
+                <div class="help-section mb-4">
+                    <h2>Administration</h2>
+                    <p>
+                        La section <strong>Admin</strong> (accessible via le bouton dans la barre de navigation)
+                        permet de gérer les utilisateurs de la plateforme.
+                    </p>
+                    <ul>
+                        <li><strong>Créer un utilisateur :</strong> saisissez un numéro de téléphone.</li>
+                        <li><strong>Promouvoir/rétrograder :</strong> accordez ou retirez les droits administrateur.</li>
+                        <li><strong>Supprimer :</strong> supprimez un utilisateur (impossible pour les administrateurs).</li>
+                    </ul>
+                    <p>
+                        Vous ne pouvez pas retirer vos propres droits administrateur ni supprimer votre propre compte.
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
