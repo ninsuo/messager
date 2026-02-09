@@ -18,6 +18,7 @@ class Trigger implements EncryptedResourceInterface
 {
     public const TYPE_SMS = 'sms';
     public const TYPE_CALL = 'call';
+    public const TYPE_BOTH = 'both';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

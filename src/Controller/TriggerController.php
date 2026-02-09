@@ -135,7 +135,7 @@ class TriggerController extends AbstractController
             $type = (string) ($data['type'] ?? Trigger::TYPE_SMS);
             $trigger->setType($type);
 
-            if (Trigger::TYPE_SMS === $type) {
+            if (Trigger::TYPE_SMS === $type || Trigger::TYPE_BOTH === $type) {
                 $content = GSM::enforceGSMAlphabet($content);
             }
 

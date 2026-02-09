@@ -3,6 +3,7 @@
 namespace App\MessageHandler;
 
 use App\Entity\Message;
+use App\Entity\Trigger;
 use App\Message\SendMessage;
 use App\Message\TriggerMessage;
 use App\Repository\TriggerRepository;
@@ -31,12 +32,17 @@ class TriggerHandler
             return;
         }
 
+        $types = $this->getMessageTypes($trigger);
+
         foreach ($trigger->getContacts() as $contact) {
-            $message = new Message();
-            $message->setUuid(Uuid::v4()->toRfc4122());
-            $message->setContact($contact);
-            $message->setStatus(Message::STATUS_PENDING);
-            $trigger->addMessage($message);
+            foreach ($types as $type) {
+                $message = new Message();
+                $message->setUuid(Uuid::v4()->toRfc4122());
+                $message->setContact($contact);
+                $message->setType($type);
+                $message->setStatus(Message::STATUS_PENDING);
+                $trigger->addMessage($message);
+            }
         }
 
         $this->entityManager->flush();
@@ -46,5 +52,16 @@ class TriggerHandler
                 $this->messageBus->dispatch(new SendMessage($message->getUuid()));
             }
         }
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getMessageTypes(Trigger $trigger): array
+    {
+        return match ($trigger->getType()) {
+            Trigger::TYPE_BOTH => [Trigger::TYPE_SMS, Trigger::TYPE_CALL],
+            default => [$trigger->getType() ?? Trigger::TYPE_SMS],
+        };
     }
 }

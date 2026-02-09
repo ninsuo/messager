@@ -54,21 +54,24 @@ class SendMessageHandler
         }
 
         $context = ['message_uuid' => $message->getUuid()];
+        $messageType = $message->getType() ?? $trigger->getType();
 
         try {
-            if (Trigger::TYPE_SMS === $trigger->getType()) {
+            if (Trigger::TYPE_SMS === $messageType) {
                 $this->smsProvider->send(
                     $this->fromNumber,
                     $toNumber,
                     $trigger->getContent() ?? '',
                     $context,
                 );
-            } else {
+            } elseif (Trigger::TYPE_CALL === $messageType) {
                 $this->callProvider->send(
                     $this->fromNumber,
                     $toNumber,
                     $context,
                 );
+            } else {
+                throw new \RuntimeException('Unsupported message type: ' . $messageType);
             }
 
             $message->setStatus(Message::STATUS_SENT);

@@ -10,8 +10,8 @@
     {% endif %}
 >
     <div class="d-flex align-items-start gap-3">
-        <span class="badge {{ trigger.type == 'sms' ? 'bg-info' : 'bg-warning text-dark' }} trigger-badge">
-            {{ trigger.type == 'sms' ? 'SMS' : 'Appel' }}
+        <span class="badge {{ trigger.type == 'sms' ? 'bg-info' : (trigger.type == 'both' ? 'bg-success' : 'bg-warning text-dark') }} trigger-badge">
+            {{ trigger.type == 'sms' ? 'SMS' : (trigger.type == 'both' ? 'SMS + Appel' : 'Appel') }}
         </span>
         <div class="flex-grow-1 min-w-0">
             <p class="trigger-content mb-1">{{ trigger.content|length > 120 ? trigger.content|slice(0, 120) ~ '…' : trigger.content }}</p>

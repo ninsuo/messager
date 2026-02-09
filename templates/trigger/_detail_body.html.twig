@@ -56,6 +56,9 @@
                 <thead>
                     <tr>
                         <th>Contact</th>
+                        {% if trigger.type == 'both' %}
+                            <th>Type</th>
+                        {% endif %}
                         <th>Statut</th>
                         <th>Erreur</th>
                     </tr>
@@ -64,6 +67,13 @@
                     {% for message in messages %}
                         <tr>
                             <td>{{ message.contact.phoneNumber|mask_phone }}</td>
+                            {% if trigger.type == 'both' %}
+                                <td>
+                                    <span class="badge {{ message.type == 'sms' ? 'bg-info' : 'bg-warning text-dark' }} badge-sm">
+                                        {{ message.type == 'sms' ? 'SMS' : 'Appel' }}
+                                    </span>
+                                </td>
+                            {% endif %}
                             <td>
                                 {% if message.status == 'delivered' %}
                                     <span class="badge bg-success">Distribué</span>

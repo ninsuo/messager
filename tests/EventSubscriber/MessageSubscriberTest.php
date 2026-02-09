@@ -294,6 +294,64 @@ class MessageSubscriberTest extends KernelTestCase
         $this->assertSame('Message vocal test.', $sms->getMessage());
     }
 
+    public function testCallAnsweringMachineSkipsSmsForBothTrigger(): void
+    {
+        $user = $this->createUser('+33600500020');
+        $contact = $this->createContact('+33611500020');
+        $trigger = $this->createTrigger($user, Trigger::TYPE_BOTH, 'Message both test.');
+        $trigger->addContact($contact);
+        $message = $this->createMessage($trigger, $contact);
+
+        $smsCountBefore = count(
+            self::getContainer()->get(FakeSmsRepository::class)->findAll()
+        );
+
+        $call = new TwilioCall();
+        $call->setUuid(Uuid::v4()->toRfc4122());
+        $call->setDirection(TwilioCall::DIRECTION_OUTBOUND);
+        $call->setFromNumber('+33700000000');
+        $call->setToNumber('+33611500020');
+        $call->setContext(['message_uuid' => $message->getUuid()]);
+
+        $event = new TwilioCallEvent($call);
+        $this->eventDispatcher->dispatch($event, TwilioEvent::CALL_ANSWERING_MACHINE);
+
+        $smsCountAfter = count(
+            self::getContainer()->get(FakeSmsRepository::class)->findAll()
+        );
+
+        $this->assertSame($smsCountBefore, $smsCountAfter, 'BOTH trigger should NOT fall back to SMS on answering machine');
+    }
+
+    public function testCallAnsweringMachineStillFallsBackForCallTrigger(): void
+    {
+        $user = $this->createUser('+33600500021');
+        $contact = $this->createContact('+33611500021');
+        $trigger = $this->createTrigger($user, Trigger::TYPE_CALL, 'Call only test.');
+        $trigger->addContact($contact);
+        $message = $this->createMessage($trigger, $contact);
+
+        $smsCountBefore = count(
+            self::getContainer()->get(FakeSmsRepository::class)->findAll()
+        );
+
+        $call = new TwilioCall();
+        $call->setUuid(Uuid::v4()->toRfc4122());
+        $call->setDirection(TwilioCall::DIRECTION_OUTBOUND);
+        $call->setFromNumber('+33700000000');
+        $call->setToNumber('+33611500021');
+        $call->setContext(['message_uuid' => $message->getUuid()]);
+
+        $event = new TwilioCallEvent($call);
+        $this->eventDispatcher->dispatch($event, TwilioEvent::CALL_ANSWERING_MACHINE);
+
+        $smsCountAfter = count(
+            self::getContainer()->get(FakeSmsRepository::class)->findAll()
+        );
+
+        $this->assertSame($smsCountBefore + 1, $smsCountAfter, 'CALL trigger should still fall back to SMS on answering machine');
+    }
+
     public function testCallAnsweringMachineWithoutContextIsIgnored(): void
     {
         $call = new TwilioCall();

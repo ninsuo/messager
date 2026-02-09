@@ -33,6 +33,9 @@ class Message
     #[ORM\JoinColumn(nullable: false)]
     private ?Contact $contact = null;
 
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $type = null;
+
     #[ORM\Column(length: 20)]
     private ?string $status = self::STATUS_PENDING; // @phpstan-ignore property.unusedType
 
@@ -67,6 +70,18 @@ class Message
     public function setTrigger(Trigger $trigger): static
     {
         $this->trigger = $trigger;
+
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(?string $type): static
+    {
+        $this->type = $type;
 
         return $this;
     }

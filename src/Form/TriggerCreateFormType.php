@@ -48,6 +48,7 @@ class TriggerCreateFormType extends AbstractType
                 'choices' => [
                     'SMS' => Trigger::TYPE_SMS,
                     'Appel' => Trigger::TYPE_CALL,
+                    'SMS + Appel' => Trigger::TYPE_BOTH,
                 ],
                 'expanded' => true,
                 'data' => Trigger::TYPE_SMS,

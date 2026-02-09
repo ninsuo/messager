@@ -3,6 +3,7 @@
 namespace App\EventSubscriber;
 
 use App\Entity\Message;
+use App\Entity\Trigger;
 use App\Event\TwilioCallEvent;
 use App\Event\TwilioEvent;
 use App\Event\TwilioMessageEvent;
@@ -180,6 +181,11 @@ class MessageSubscriber implements EventSubscriberInterface
         $contact = $message->getContact();
 
         if (null === $trigger || null === $contact) {
+            return;
+        }
+
+        // Skip SMS fallback for BOTH triggers — an SMS was already sent separately
+        if (Trigger::TYPE_BOTH === $trigger->getType()) {
             return;
         }
 

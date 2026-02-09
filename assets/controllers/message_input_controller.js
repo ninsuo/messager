@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus';
 
-const LIMITS = { sms: 306, call: 1600 };
+const LIMITS = { sms: 306, call: 1600, both: 306 };
 
 export default class extends Controller {
     static targets = ['type', 'content', 'progressBar', 'counter'];
