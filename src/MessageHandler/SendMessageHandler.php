@@ -8,7 +8,6 @@ use App\Message\SendMessage;
 use App\Provider\Call\CallProvider;
 use App\Provider\SMS\SmsProvider;
 use App\Repository\MessageRepository;
-use App\Tool\GSM;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -21,6 +20,8 @@ class SendMessageHandler
         private readonly EntityManagerInterface $entityManager,
         private readonly SmsProvider $smsProvider,
         private readonly CallProvider $callProvider,
+        #[Autowire(env: 'TWILIO_SENDER_ID')]
+        private readonly string $smsSenderId,
         #[Autowire(env: 'TWILIO_PHONE_NUMBER')]
         private readonly string $fromNumber,
     ) {
@@ -59,7 +60,7 @@ class SendMessageHandler
         try {
             if (Trigger::TYPE_SMS === $messageType) {
                 $this->smsProvider->send(
-                    $this->fromNumber,
+                    $this->smsSenderId,
                     $toNumber,
                     $trigger->getContent() ?? '',
                     $context,

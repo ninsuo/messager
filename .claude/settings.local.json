@@ -21,7 +21,10 @@
       "WebFetch(domain:www.linkmobility.com)",
       "WebFetch(domain:developer.linkmobility.eu)",
       "WebFetch(domain:linkmobility.atlassian.net)",
-      "WebFetch(domain:documentation.msghub.cloud)"
+      "WebFetch(domain:documentation.msghub.cloud)",
+      "WebFetch(domain:support.twilio.com)",
+      "WebFetch(domain:www.twilio.com)",
+      "WebFetch(domain:help.twilio.com)"
     ]
   }
 }

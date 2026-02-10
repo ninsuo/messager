@@ -27,8 +27,8 @@ class FirstFactorTriggerAuthenticator extends AbstractAuthenticator implements A
         private readonly UnguessableCodeManager $codeManager,
         private readonly SmsProvider $smsProvider,
         private readonly UrlGeneratorInterface $urlGenerator,
-        #[Autowire(env: 'TWILIO_PHONE_NUMBER')]
-        private readonly string $twilioPhoneNumber,
+        #[Autowire(env: 'TWILIO_SENDER_ID')]
+        private readonly string $twilioSenderId,
     ) {
     }
 
@@ -59,7 +59,7 @@ class FirstFactorTriggerAuthenticator extends AbstractAuthenticator implements A
 
         if ($user) {
             $this->smsProvider->send(
-                $this->twilioPhoneNumber,
+                $this->twilioSenderId,
                 $phone,
                 sprintf('Votre code Messager : %s', $formattedCode),
             );
