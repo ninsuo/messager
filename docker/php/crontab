@@ -1,0 +1,1 @@
+0 3 * * * php /var/www/bin/console twilio:clean --env=prod >> /proc/1/fd/1 2>&1

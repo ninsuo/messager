@@ -81,3 +81,15 @@ services:
     depends_on:
       - mysql
     restart: unless-stopped
+
+  cron:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      target: cron
+    user: "0:0"
+    volumes:
+      - .:/var/www
+    depends_on:
+      - mysql
+    restart: unless-stopped

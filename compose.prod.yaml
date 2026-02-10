@@ -83,6 +83,15 @@ services:
       restart_policy:
         condition: any
 
+  cron:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile.prod
+      target: cron
+    deploy:
+      restart_policy:
+        condition: any
+
 volumes:
   caddy_data:
   caddy_config:

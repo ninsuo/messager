@@ -50,3 +50,8 @@ ENTRYPOINT ["php-fpm"]
 FROM base AS worker
 
 ENTRYPOINT ["php", "bin/console", "messenger:consume", "async", "-vv", "--time-limit=3600", "--sleep=0.5"]
+
+FROM base AS cron
+
+COPY docker/php/crontab /etc/crontabs/root
+ENTRYPOINT ["crond", "-f"]

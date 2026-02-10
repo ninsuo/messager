@@ -61,3 +61,11 @@ services:
       DATABASE_URL: ${DATABASE_URL}
       APP_SECRET: ${APP_SECRET}
       APP_ENV: ${APP_ENV:-prod}
+
+  cron:
+    depends_on:
+      - mysql
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      APP_SECRET: ${APP_SECRET}
+      APP_ENV: ${APP_ENV:-prod}
