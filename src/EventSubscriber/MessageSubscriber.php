@@ -24,11 +24,33 @@ class MessageSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
+            TwilioEvent::STATUS_UPDATED => 'onStatusUpdated',
             TwilioEvent::MESSAGE_ERROR => 'onMessageError',
             TwilioEvent::CALL_RECEIVED => 'onCallReceived',
             TwilioEvent::CALL_ESTABLISHED => 'onCallEstablished',
             TwilioEvent::CALL_ERROR => 'onCallError',
         ];
+    }
+
+    public function onStatusUpdated(TwilioMessageEvent $event): void
+    {
+        $message = $this->getMessageFromSmsEvent($event);
+
+        if (null === $message) {
+            return;
+        }
+
+        $twilioStatus = $event->getMessage()->getStatus();
+
+        // Map Twilio status to App status
+        if ('delivered' === $twilioStatus) {
+            $message->setStatus(Message::STATUS_DELIVERED);
+        } elseif ('failed' === $twilioStatus || 'undelivered' === $twilioStatus) {
+            $message->setStatus(Message::STATUS_FAILED);
+        }
+        // We can ignore other statuses like 'sent', 'queued' as they are intermediate
+
+        $this->entityManager->flush();
     }
 
     public function onMessageError(TwilioMessageEvent $event): void

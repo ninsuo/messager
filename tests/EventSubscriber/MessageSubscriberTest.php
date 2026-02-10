@@ -54,6 +54,31 @@ class MessageSubscriberTest extends KernelTestCase
         $this->assertSame('Carrier rejected', $message->getError());
     }
 
+    public function testStatusUpdatedSyncsToMessage(): void
+    {
+        $user = $this->createUser('+33600500091');
+        $contact = $this->createContact('+33611500091');
+        $trigger = $this->createTrigger($user, Trigger::TYPE_SMS, 'Test Status');
+        $trigger->addContact($contact);
+        $message = $this->createMessage($trigger, $contact);
+
+        $twilioMessage = new TwilioMessage();
+        $twilioMessage->setUuid(Uuid::v4()->toRfc4122());
+        $twilioMessage->setDirection(TwilioMessage::DIRECTION_OUTBOUND);
+        $twilioMessage->setFromNumber('+33700000000');
+        $twilioMessage->setToNumber('+33611500091');
+        $twilioMessage->setContext(['message_uuid' => $message->getUuid()]);
+        $twilioMessage->setStatus('delivered');
+
+        $event = new TwilioMessageEvent($twilioMessage);
+        $this->eventDispatcher->dispatch($event, TwilioEvent::STATUS_UPDATED);
+
+        $em = self::getContainer()->get(\Doctrine\ORM\EntityManagerInterface::class);
+        $em->refresh($message);
+
+        $this->assertSame(Message::STATUS_DELIVERED, $message->getStatus());
+    }
+
     public function testMessageErrorWithoutContextIsIgnored(): void
     {
         $twilioMessage = new TwilioMessage();

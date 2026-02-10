@@ -13,15 +13,11 @@
             {{ form_start(form, {attr: {id: 'trigger-form'}}) }}
 
                 {# ── Audience ── #}
-                <div class="form-section mb-4">
+                <div class="form-section mb-4" data-controller="book-save">
                     <h2 class="form-section-title">Audience</h2>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Listes de contacts</label>
-
-                        {% if form.books|length == 0 %}
-                            <p class="text-muted small">Aucune liste disponible.</p>
-                        {% else %}
+                    {% if form.books|length > 0 %}
+                        <div class="mb-3">
                             <div class="book-list">
                                 {% for child in form.books %}
                                     {% set book = books[child.vars.value] %}
@@ -44,17 +40,23 @@
                                     </div>
                                 {% endfor %}
                             </div>
-                        {% endif %}
+                        </div>
+                    {% endif %}
+
+                    <div class="form-check mb-2">
+                        <input type="checkbox" class="form-check-input" id="contact-others-toggle"
+                               data-action="change->book-save#toggleContacts">
+                        <label class="form-check-label" for="contact-others-toggle">Contacter quelqu'un d'autre…</label>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="{{ form.phones.vars.id }}" class="form-label fw-semibold">Contacts</label>
-                        {{ form_widget(form.phones) }}
-                    </div>
+                    <div class="d-none" data-book-save-target="contactFields">
+                        <div class="mb-3 mt-3">
+                            <label for="{{ form.phones.vars.id }}" class="form-label fw-semibold">Numéros de téléphone</label>
+                            {{ form_widget(form.phones) }}
+                        </div>
 
-                    <div data-controller="book-save">
                         <div class="form-check mb-2">
-                            {{ form_widget(form.saveAsBook, {attr: {class: 'form-check-input', 'data-book-save-target': 'toggle', 'data-action': 'change->book-save#toggle'}}) }}
+                            {{ form_widget(form.saveAsBook, {attr: {class: 'form-check-input', 'data-book-save-target': 'saveToggle', 'data-action': 'change->book-save#toggleSave'}}) }}
                             <label class="form-check-label" for="{{ form.saveAsBook.vars.id }}">Sauvegarder comme liste de contacts</label>
                         </div>
                         <div class="d-none" data-book-save-target="nameField">

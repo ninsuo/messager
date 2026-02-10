@@ -86,6 +86,11 @@ class TwilioMessageManager
             );
         }
 
+        $this->logger->info('Sending Twilio message', [
+            'to' => $to,
+            'statusCallback' => $options['statusCallback'],
+        ]);
+
         $entity = new TwilioMessage();
         $entity->setUuid($options['messageUuid']);
         $entity->setDirection(TwilioMessage::DIRECTION_OUTBOUND);

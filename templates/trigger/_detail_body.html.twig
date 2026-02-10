@@ -1,7 +1,7 @@
-{% set has_pending = counts.pending > 0 %}
+{% set has_active = (counts.pending > 0) or (counts.sent > 0) %}
 {% set is_recent = trigger.createdAt|date('U') > 'now'|date('U') - 10800 %}
 {% set is_initializing = counts.total == 0 and is_recent %}
-{% set should_poll = is_recent and (has_pending or is_initializing) %}
+{% set should_poll = is_recent and (has_active or is_initializing) %}
 
 <div id="trigger-detail-body"
     {% if should_poll %}
