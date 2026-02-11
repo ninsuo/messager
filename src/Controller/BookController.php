@@ -25,6 +25,35 @@ class BookController extends AbstractController
     ) {
     }
 
+    #[Route('', name: 'book_index', methods: ['GET'])]
+    public function index(): Response
+    {
+        return $this->render('book/index.html.twig', [
+            'books' => $this->bookRepository->findAll(),
+        ]);
+    }
+
+    #[Route('/create', name: 'book_create', methods: ['POST'])]
+    public function create(Request $request): Response
+    {
+        $name = trim($request->request->getString('name'));
+
+        if ('' === $name) {
+            $this->addFlash('error', 'Le nom de la liste ne peut pas être vide.');
+
+            return $this->redirectToRoute('book_index');
+        }
+
+        $book = new Book();
+        $book->setUuid(Uuid::v4()->toRfc4122());
+        $book->setName($name);
+        $this->bookRepository->save($book);
+
+        $this->addFlash('success', 'Liste de contacts créée.');
+
+        return $this->redirectToRoute('book_index');
+    }
+
     #[Route('/{uuid}/edit', name: 'book_edit', methods: ['GET'])]
     public function edit(#[MapEntity(mapping: ['uuid' => 'uuid'])] Book $book): Response
     {
@@ -47,66 +76,60 @@ class BookController extends AbstractController
         }
 
         $book->setName($name);
-        $this->bookRepository->save($book);
 
-        $this->addFlash('success', 'Liste de contacts mise à jour.');
+        // Sync contacts from textarea
+        $phonesRaw = $request->request->getString('phones');
+        $invalid = [];
+        /** @var array<string, Contact> $desiredContacts */
+        $desiredContacts = [];
 
-        return $this->redirectToRoute('book_edit', ['uuid' => $book->getUuid()]);
-    }
+        foreach (explode("\n", $phonesRaw) as $line) {
+            $raw = trim($line);
+            if ('' === $raw) {
+                continue;
+            }
 
-    #[Route('/{uuid}/contact/add', name: 'book_contact_add', methods: ['POST'])]
-    public function addContact(
-        #[MapEntity(mapping: ['uuid' => 'uuid'])] Book $book,
-        Request $request,
-    ): Response {
-        $phone = Phone::normalize(trim($request->request->getString('phone')));
+            $phone = Phone::normalize($raw);
+            if (null === $phone) {
+                $invalid[] = $raw;
+                continue;
+            }
 
-        if (null === $phone) {
-            $this->addFlash('error', 'Numéro de téléphone français invalide.');
+            if (isset($desiredContacts[$phone])) {
+                continue;
+            }
 
-            return $this->redirectToRoute('book_edit', ['uuid' => $book->getUuid()]);
+            $contact = $this->contactRepository->findByPhoneNumber($phone);
+            if (null === $contact) {
+                $contact = new Contact();
+                $contact->setUuid(Uuid::v4()->toRfc4122());
+                $contact->setPhoneNumber($phone);
+                $this->contactRepository->save($contact);
+            }
+
+            $desiredContacts[$phone] = $contact;
         }
 
-        $contact = $this->contactRepository->findByPhoneNumber($phone);
-
-        if (null === $contact) {
-            $contact = new Contact();
-            $contact->setUuid(Uuid::v4()->toRfc4122());
-            $contact->setPhoneNumber($phone);
-            $this->contactRepository->save($contact);
-        }
-
-        if ($book->getContacts()->contains($contact)) {
-            $this->addFlash('error', 'Ce contact est déjà dans la liste.');
-
-            return $this->redirectToRoute('book_edit', ['uuid' => $book->getUuid()]);
-        }
-
-        $book->addContact($contact);
-        $this->bookRepository->save($book);
-
-        $this->addFlash('success', 'Contact ajouté.');
-
-        return $this->redirectToRoute('book_edit', ['uuid' => $book->getUuid()]);
-    }
-
-    #[Route('/{uuid}/contact/{contactUuid}/remove', name: 'book_contact_remove', methods: ['POST'])]
-    public function removeContact(
-        #[MapEntity(mapping: ['uuid' => 'uuid'])] Book $book,
-        string $contactUuid,
-    ): Response {
-        foreach ($book->getContacts() as $contact) {
-            if ($contact->getUuid() === $contactUuid) {
-                $book->removeContact($contact);
-                $this->bookRepository->save($book);
-
-                $this->addFlash('success', 'Contact retiré.');
-
-                return $this->redirectToRoute('book_edit', ['uuid' => $book->getUuid()]);
+        // Remove contacts no longer in the textarea
+        foreach ($book->getContacts()->toArray() as $existing) {
+            $phone = $existing->getPhoneNumber();
+            if (null === $phone || !isset($desiredContacts[$phone])) {
+                $book->removeContact($existing);
             }
         }
 
-        $this->addFlash('error', 'Contact introuvable.');
+        // Add new contacts
+        foreach ($desiredContacts as $contact) {
+            $book->addContact($contact);
+        }
+
+        $this->bookRepository->save($book);
+
+        if ([] !== $invalid) {
+            $this->addFlash('error', 'Numéros invalides ignorés : ' . implode(', ', $invalid));
+        }
+
+        $this->addFlash('success', 'Liste de contacts mise à jour.');
 
         return $this->redirectToRoute('book_edit', ['uuid' => $book->getUuid()]);
     }
@@ -118,6 +141,6 @@ class BookController extends AbstractController
 
         $this->addFlash('success', 'Liste de contacts supprimée.');
 
-        return $this->redirectToRoute('trigger_create');
+        return $this->redirectToRoute('book_index');
     }
 }

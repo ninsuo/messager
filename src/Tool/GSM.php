@@ -4,158 +4,29 @@ namespace App\Tool;
 
 class GSM
 {
-    const ALPHABET = [
-        'A',
-        'B',
-        'C',
-        'D',
-        'E',
-        'F',
-        'G',
-        'H',
-        'I',
-        'J',
-        'K',
-        'L',
-        'M',
-        'N',
-        'O',
-        'P',
-        'Q',
-        'R',
-        'S',
-        'T',
-        'U',
-        'V',
-        'W',
-        'X',
-        'Y',
-        'Z',
-        'a',
-        'b',
-        'c',
-        'd',
-        'e',
-        'f',
-        'g',
-        'h',
-        'i',
-        'j',
-        'k',
-        'l',
-        'm',
-        'n',
-        'o',
-        'p',
-        'q',
-        'r',
-        's',
-        't',
-        'u',
-        'v',
-        'w',
-        'x',
-        'y',
-        'z',
-        '0',
-        '1',
-        '2',
-        '3',
-        '4',
-        '5',
-        '6',
-        '7',
-        '8',
-        '9',
-        '!',
-        '#',
-        ' ',
-        '"',
-        '%',
-        '&',
-        '\'',
-        '(',
-        ')',
-        '*',
-        ',',
-        '.',
-        '?',
-        '+',
-        '-',
-        '/',
-        ';',
-        ':',
-        '<',
-        '=',
-        '>',
-        '¡',
-        '¿',
-        '_',
-        '@',
-        '§',
-        '$',
-        '£',
-        '¥',
-        'è',
-        'é',
-        'ù',
-        'ì',
-        'ò',
-        'Ç',
-        'Ø',
-        'ø',
-        'Æ',
-        'æ',
-        'ß',
-        'É',
-        'Å',
-        'å',
-        'Ä',
-        'Ö',
-        'Ñ',
-        'Ü',
-        'ä',
-        'ö',
-        'ñ',
-        'ü',
-        'à',
+    public const ALPHABET = [
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+        'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+        'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        '!', '#', ' ', '"', '%', '&', '\'', '(', ')', '*', ',', '.', '?',
+        '+', '-', '/', ';', ':', '<', '=', '>',
+        '¡', '¿', '_', '@', '§', '$', '£', '¥',
+        'è', 'é', 'ù', 'ì', 'ò', 'Ç', 'Ø', 'ø', 'Æ', 'æ', 'ß', 'É',
+        'Å', 'å', 'Ä', 'Ö', 'Ñ', 'Ü', 'ä', 'ö', 'ñ', 'ü', 'à',
         "\n",
-        // "\r",
-        'Δ',
-        'Φ',
-        'Γ',
-        'Λ',
-        'Ω',
-        'Π',
-        'Ψ',
-        'Σ',
-        'Θ',
-        'Ξ',
-        '¤',
-        '€',
-        '[',
-        ']',
-        '{',
-        '}',
-        '\\',
-        '^',
-        '~',
-        '|',
+        'Δ', 'Φ', 'Γ', 'Λ', 'Ω', 'Π', 'Ψ', 'Σ', 'Θ', 'Ξ',
+        '¤', '€',
+        '[', ']', '{', '}', '\\', '^', '~', '|',
     ];
 
-    const ESCAPED = [
-        '€',
-        //        '[',
-        //        ']',
-        //        '{',
-        //        '}',
-        '\\',
-        '^',
-        //        '~',
-        '|',
+    public const ESCAPED = [
+        '€', '\\', '^', '|',
     ];
 
-    const TRANSLITERATION = [
+    /** @var array<string, string> */
+    public const TRANSLITERATION = [
         '/[ \t]{2,}/'                         => ' ',
         '/\r\n|\r/'                           => "\n",
         '/ /'                                 => ' ',
@@ -167,10 +38,10 @@ class GSM
         '/₽/'                                 => 'p',
         '/·/'                                 => '.',
         '/ѣ|Ѣ|́|Ь|ь|Ъ|ъ/'                     => '',
-        '/º|°/'                               => 0,
-        '/¹/'                                 => 1,
-        '/²/'                                 => 2,
-        '/³/'                                 => 3,
+        '/º|°/'                               => '0',
+        '/¹/'                                 => '1',
+        '/²/'                                 => '2',
+        '/³/'                                 => '3',
         '/ǽ/'                                 => 'ae',
         '/œ/'                                 => 'oe',
         '/À|Á|Â|Ã|Ǻ|Ā|Ă|Ą|Ǎ|А|Α/'             => 'A',
@@ -194,7 +65,7 @@ class GSM
         '/Ì|Í|Î|Ï|Ĩ|Ī|Ĭ|Ǐ|Į|İ|И|Й|І/'         => 'I',
         '/í|î|ï|ĩ|ī|ĭ|ǐ|į|ı|и|й|і/'           => 'i',
         '/Ĵ/'                                 => 'J',
-        '/ĵ/'                                 => 'j',
+        '/ĵ/'                                 => 'J',
         '/Ķ|К/'                               => 'K',
         '/ķ|к/'                               => 'k',
         '/Х/'                                 => 'Kh',
@@ -267,18 +138,13 @@ class GSM
         '/ꙗ/'                                 => 'ja',
         '/Ꙗ/'                                 => 'ja',
         '/«|»/'                               => '"',
-        '/’|`/'                               => '\'',
+        '/\x{2019}|`/u'                       => '\'',
     ];
 
-    /**
-     * @param string $message
-     *
-     * @return string
-     */
-    private static function isGSMCompatible(string $message) : string
+    public static function isGSMCompatible(string $message): bool
     {
-        foreach (preg_split('//u', $message, null, PREG_SPLIT_NO_EMPTY) as $letter) {
-            if (!in_array($letter, self::ALPHABET)) {
+        foreach (mb_str_split($message) as $letter) {
+            if (!in_array($letter, self::ALPHABET, true)) {
                 return false;
             }
         }
@@ -286,94 +152,65 @@ class GSM
         return true;
     }
 
-    /**
-     * @param string $message
-     *
-     * @return string
-     */
-    public static function transliterate(string $message) : string
+    public static function transliterate(string $message): string
     {
-        return trim(preg_replace(
+        return trim((string) preg_replace(
             array_keys(self::TRANSLITERATION),
             array_values(self::TRANSLITERATION),
             $message
         ));
     }
 
-    /**
-     * @param string $message
-     *
-     * @return string
-     */
-    public static function enforceGSMAlphabet(string $message) : string
+    public static function enforceGSMAlphabet(string $message): string
     {
         $sanitized = '';
-        foreach (preg_split('//u', self::transliterate($message), -1, PREG_SPLIT_NO_EMPTY) as $letter) {
-            if (!in_array($letter, self::ALPHABET)) {
-                $sanitized .= '?';
-            } else {
-                $sanitized .= $letter;
-            }
+        foreach (mb_str_split(self::transliterate($message)) as $letter) {
+            $sanitized .= in_array($letter, self::ALPHABET, true) ? $letter : '?';
         }
 
         return $sanitized;
     }
 
     /**
-     * @param string $message
-     *
-     * @return array
+     * @return list<string>
      */
-    public static function getSMSParts(string $message) : array
+    public static function getSMSParts(string $message): array
     {
-        $unicode = false;
-        if (!self::isGSMCompatible($message)) {
-            $unicode = true;
-        }
+        $unicode = !self::isGSMCompatible($message);
 
         $length = 0;
-        foreach (preg_split('//u', $message, null, PREG_SPLIT_NO_EMPTY) as $letter) {
-            if (!$unicode && in_array($letter, self::ESCAPED)) {
-                $length += 1;
+        foreach (mb_str_split($message) as $letter) {
+            if (!$unicode && in_array($letter, self::ESCAPED, true)) {
+                ++$length;
             }
-
-            $length++;
+            ++$length;
         }
 
-        $multipart = false;
-        if ((!$unicode && $length > 160) || ($unicode && $length > 70)) {
-            $multipart = true;
-        }
+        $multipart = (!$unicode && $length > 160) || ($unicode && $length > 70);
 
         if (!$multipart) {
             return [$message];
         }
 
-        $parts  = [];
-        $part   = '';
+        $partLimit = $unicode ? 67 : 153;
+        $parts = [];
+        $part = '';
         $length = 0;
-        foreach (preg_split('//u', $message, null, PREG_SPLIT_NO_EMPTY) as $letter) {
-            if (!$unicode && in_array($letter, self::ESCAPED)) {
-                if ($length == 152) {
-                    $parts[] = $part;
-                    $part    = '';
-                    $length  = 0;
-                }
-                $part   .= '-'; // Escaping character
-                $length += 1;
-            }
 
-            if ((!$unicode && $length == 153) || ($unicode && $length == 67)) {
+        foreach (mb_str_split($message) as $letter) {
+            $charSize = (!$unicode && in_array($letter, self::ESCAPED, true)) ? 2 : 1;
+
+            if ($length + $charSize > $partLimit) {
                 $parts[] = $part;
-                $part    = '';
-                $length  = 0;
+                $part = '';
+                $length = 0;
             }
 
-            $part   .= $letter;
-            $length += 1;
+            $part .= $letter;
+            $length += $charSize;
         }
 
-        if ($part) {
+        if ('' !== $part) {
             $parts[] = $part;
         }
 
