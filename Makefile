@@ -14,4 +14,4 @@ test:
 	docker compose exec php vendor/bin/phpunit -c phpunit.dist.xml
 
 restart-workers:
-	docker compose restart worker1 worker2 worker3
+	docker compose restart worker1 worker2 worker3 worker4
