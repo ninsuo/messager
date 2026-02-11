@@ -28,8 +28,8 @@ class HomeController extends AbstractController
         $user = $this->getUser();
 
         if ($user instanceof User) {
-            $triggers = $this->triggerRepository->findByUser($user);
-            $statusCounts = $this->messageRepository->getStatusCountsByUser($user);
+            $triggers = $this->triggerRepository->findAllOrderedByDate();
+            $statusCounts = $this->messageRepository->getStatusCountsAll();
 
             return $this->render('home/index.html.twig', [
                 'triggers' => $triggers,
@@ -58,12 +58,6 @@ class HomeController extends AbstractController
     public function triggerStatus(
         #[MapEntity(mapping: ['uuid' => 'uuid'])] Trigger $trigger,
     ): Response {
-        $user = $this->getUser();
-
-        if (!$user instanceof User || $trigger->getUser()?->getId() !== $user->getId()) {
-            throw $this->createAccessDeniedException();
-        }
-
         $counts = $this->messageRepository->getStatusCountsByTrigger($trigger);
 
         return $this->render('home/_trigger_card.html.twig', [

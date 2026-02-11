@@ -49,6 +49,20 @@ class MessageRepository extends ServiceEntityRepository
     }
 
     /**
+     * @return array<int, array{pending: int, sent: int, delivered: int, failed: int, total: int}>
+     */
+    public function getStatusCountsAll(): array
+    {
+        $rows = $this->createQueryBuilder('m')
+            ->select('IDENTITY(m.trigger) AS trigger_id, m.status, COUNT(m.id) AS cnt')
+            ->groupBy('trigger_id, m.status')
+            ->getQuery()
+            ->getArrayResult();
+
+        return $this->buildStatusCounts($rows);
+    }
+
+    /**
      * @return array{pending: int, sent: int, delivered: int, failed: int, total: int}
      */
     public function getStatusCountsByTrigger(Trigger $trigger): array

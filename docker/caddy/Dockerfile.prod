@@ -2,9 +2,11 @@ FROM caddy:2
 
 # Note: Context is project root
 COPY docker/caddy/Caddyfile.prod /etc/caddy/Caddyfile
+
+# Copy only the public folder, but we will ignore public/assets
+# because it is managed by a shared volume from the PHP container.
 COPY public /var/www/public
-COPY assets /var/www/assets
-COPY vendor /var/www/vendor
+RUN rm -rf /var/www/public/assets
 
 WORKDIR /var/www
 

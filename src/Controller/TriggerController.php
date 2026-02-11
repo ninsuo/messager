@@ -166,13 +166,6 @@ class TriggerController extends AbstractController
         #[MapEntity(mapping: ['uuid' => 'uuid'])] Trigger $trigger,
         MessageRepository $messageRepository,
     ): Response {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        if ($trigger->getUser()?->getId() !== $user->getId()) {
-            throw $this->createAccessDeniedException();
-        }
-
         $messages = $messageRepository->findByTrigger($trigger);
         $counts = $messageRepository->getStatusCountsByTrigger($trigger);
 
@@ -189,13 +182,6 @@ class TriggerController extends AbstractController
         TriggerRepository $triggerRepository,
         MessageRepository $messageRepository,
     ): Response {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        if ($trigger->getUser()?->getId() !== $user->getId()) {
-            throw $this->createAccessDeniedException();
-        }
-
         $messageRepository->removeByTrigger($trigger);
         $triggerRepository->remove($trigger);
 
@@ -209,13 +195,6 @@ class TriggerController extends AbstractController
         #[MapEntity(mapping: ['uuid' => 'uuid'])] Trigger $trigger,
         MessageRepository $messageRepository,
     ): Response {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        if ($trigger->getUser()?->getId() !== $user->getId()) {
-            throw $this->createAccessDeniedException();
-        }
-
         $messages = $messageRepository->findByTrigger($trigger);
         $counts = $messageRepository->getStatusCountsByTrigger($trigger);
 

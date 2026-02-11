@@ -16,6 +16,8 @@
         <div class="flex-grow-1 min-w-0">
             <p class="trigger-content mb-1">{{ trigger.content|length > 120 ? trigger.content|slice(0, 120) ~ '…' : trigger.content }}</p>
             <div class="trigger-meta">
+                <span class="text-info">{{ trigger.user.phoneNumber|mask_phone }}</span>
+                <span class="mx-1">&middot;</span>
                 <span>{{ trigger.contacts|length }} contact{{ trigger.contacts|length > 1 ? 's' : '' }}</span>
                 <span class="mx-1">&middot;</span>
                 <span>{{ counts.total }} message{{ counts.total > 1 ? 's' : '' }}</span>

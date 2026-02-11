@@ -36,4 +36,17 @@ class TriggerRepository extends ServiceEntityRepository
     {
         return $this->findBy(['user' => $user], ['createdAt' => 'DESC']);
     }
+
+    /**
+     * @return Trigger[]
+     */
+    public function findAllOrderedByDate(): array
+    {
+        return $this->createQueryBuilder('t')
+            ->join('t.user', 'u')
+            ->addSelect('u')
+            ->orderBy('t.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

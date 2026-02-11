@@ -6,7 +6,7 @@ PROJECT_ID=$(gcloud config get-value project)
 ZONE="europe-west9-a"
 REGION="europe-west9"
 INSTANCE_NAME="messager-vm"
-TEMPLATE_NAME="messager-template"
+TEMPLATE_NAME="messager-template-standard"
 GROUP_NAME="messager-group"
 DISK_NAME="messager-data"
 MACHINE_TYPE="e2-medium"
@@ -48,14 +48,13 @@ fi
 # 4. Create Instance Template
 # We attach the 'messager-data' disk to the template
 if ! gcloud compute instance-templates describe $TEMPLATE_NAME --quiet > /dev/null 2>&1; then
-    echo "Creating Instance Template: $TEMPLATE_NAME..."
+    echo "Creating Standard Instance Template: $TEMPLATE_NAME..."
     gcloud compute instance-templates create $TEMPLATE_NAME \
         --machine-type=$MACHINE_TYPE \
         --image-family=$IMAGE_FAMILY \
         --image-project=$IMAGE_PROJECT \
         --tags=http-server,https-server \
-        --provisioning-model=SPOT \
-        --instance-termination-action=STOP \
+        --provisioning-model=STANDARD \
         --metadata-from-file startup-script=scripts/gcp/startup.sh \
         --boot-disk-size=20GB \
         --create-disk=name=$DISK_NAME,mode=rw,device-name=$DISK_NAME,auto-delete=no
@@ -70,7 +69,7 @@ if ! gcloud compute instance-groups managed describe $GROUP_NAME --zone=$ZONE --
         --zone=$ZONE \
         --template=$TEMPLATE_NAME \
         --size=1
-    
+
     # The group will automatically use the disk defined in the template.
     # Because auto-delete=no is set in the template, the data persists.
     echo "Managed Instance Group created."
