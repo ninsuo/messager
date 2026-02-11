@@ -18,7 +18,7 @@ class LinkMobilitySmsProviderTest extends TestCase
 
         $provider = new LinkMobilitySmsProvider($client, 42);
 
-        $result = $provider->send('+33700000000', '+33612345678', 'Hello SMS');
+        $result = $provider->send('+33612345678', 'Hello SMS');
 
         $this->assertSame('sms-123', $result);
     }
@@ -32,7 +32,7 @@ class LinkMobilitySmsProviderTest extends TestCase
 
         $provider = new LinkMobilitySmsProvider($client, 42);
 
-        $result = $provider->send('+33700000000', '+33612345678', 'Hello SMS');
+        $result = $provider->send('+33612345678', 'Hello SMS');
 
         $this->assertNull($result);
     }

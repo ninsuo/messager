@@ -7,21 +7,29 @@ use App\Entity\TwilioCall;
 use App\Event\TwilioCallEvent;
 use App\Event\TwilioEvent;
 use App\Repository\FakeCallRepository;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twilio\TwiML\VoiceResponse;
 
 readonly class FakeCallProvider implements CallProvider
 {
+    private string $defaultFromNumber;
+
     public function __construct(
         private FakeCallRepository $fakeCallRepository,
         private EventDispatcherInterface $eventDispatcher,
+        #[Autowire(env: 'TWILIO_PHONE_NUMBER')]
+        string $fromNumbers,
     ) {
+        $numbers = array_map('trim', explode(',', $fromNumbers));
+        $first = $numbers[array_rand($numbers)];
+        $this->defaultFromNumber = str_starts_with($first, '+') ? $first : '+' . $first;
     }
 
-    public function send(string $from, string $to, array $context = [], ?string $content = null): ?string
+    public function send(string $to, array $context = [], ?string $content = null): ?string
     {
-        $this->triggerHook($from, $to, $context, TwilioEvent::CALL_ESTABLISHED, FakeCall::TYPE_ESTABLISH);
+        $this->triggerHook($this->defaultFromNumber, $to, $context, TwilioEvent::CALL_ESTABLISHED, FakeCall::TYPE_ESTABLISH);
 
         return sprintf('FAKE-%s', bin2hex(random_bytes(8)));
     }

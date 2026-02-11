@@ -82,6 +82,18 @@ services:
       - mysql
     restart: unless-stopped
 
+  worker4:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      target: worker
+    user: "1000:1000"
+    volumes:
+      - .:/var/www
+    depends_on:
+      - mysql
+    restart: unless-stopped
+
   cron:
     build:
       context: .

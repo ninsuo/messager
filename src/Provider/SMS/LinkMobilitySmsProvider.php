@@ -14,7 +14,7 @@ readonly class LinkMobilitySmsProvider implements SmsProvider
     ) {
     }
 
-    public function send(string $from, string $to, string $message, array $context = []): ?string
+    public function send(string $to, string $message, array $context = []): ?string
     {
         $data = $this->client->send($to, $message, $this->serviceId);
 

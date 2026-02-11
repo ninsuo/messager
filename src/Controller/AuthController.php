@@ -8,7 +8,6 @@ use App\Provider\Call\CallProvider;
 use App\Repository\FakeCallRepository;
 use App\Twig\TwimlExtension;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -43,10 +42,6 @@ class AuthController extends AbstractController
         Request $request,
         UnguessableCodeManager $codeManager,
         CallProvider $callProvider,
-        FakeCallRepository $fakeCallRepository,
-        TwimlExtension $twimlExtension,
-        #[Autowire(env: 'TWILIO_PHONE_NUMBER')]
-        string $twilioPhoneNumber,
     ): RedirectResponse {
         $session = $request->getSession();
         $sessionKey = 'voice_call_cooldown_'.$unguessableCode;
@@ -73,7 +68,7 @@ class AuthController extends AbstractController
 
         $formattedCode = substr($code, 0, 3).' '.substr($code, 3);
 
-        $callProvider->send($twilioPhoneNumber, $phone, ['auth_code' => $formattedCode]);
+        $callProvider->send($phone, ['auth_code' => $formattedCode]);
 
         $session->set($sessionKey, time());
 

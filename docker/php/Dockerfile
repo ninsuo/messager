@@ -20,7 +20,7 @@ RUN docker-php-ext-install pdo \
     && docker-php-ext-install gd
 
 RUN cd /usr/local/etc/php/conf.d/ \
-  && echo 'memory_limit = 256M' >> app.ini \
+  && echo 'memory_limit = 2G' >> app.ini \
   && echo 'post_max_size = 20M' >> app.ini \
   && echo 'max_execution_time = 60' >> app.ini \
   && echo 'upload_max_filesize = 10M' >> app.ini \

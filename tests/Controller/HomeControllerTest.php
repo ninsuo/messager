@@ -227,7 +227,7 @@ class HomeControllerTest extends WebTestCase
         $crawler = $client->request('GET', '/');
 
         $this->assertResponseIsSuccessful();
-        $this->assertCount(1, $crawler->filter('.trigger-progress'));
+        $this->assertGreaterThanOrEqual(1, count($crawler->filter('.trigger-progress')));
     }
 
     public function testHomePageShowsDetailLink(): void

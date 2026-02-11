@@ -9,5 +9,5 @@ interface SmsProvider
      *
      * @return string|null The message SID
      */
-    public function send(string $from, string $to, string $message, array $context = []): ?string;
+    public function send(string $to, string $message, array $context = []): ?string;
 }

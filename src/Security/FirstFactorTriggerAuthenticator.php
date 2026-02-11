@@ -8,7 +8,6 @@ use App\Repository\UserRepository;
 use App\Security\Exception\CodeSentException;
 use App\Tool\Phone;
 use App\Tool\Random;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,8 +26,6 @@ class FirstFactorTriggerAuthenticator extends AbstractAuthenticator implements A
         private readonly UnguessableCodeManager $codeManager,
         private readonly SmsProvider $smsProvider,
         private readonly UrlGeneratorInterface $urlGenerator,
-        #[Autowire(env: 'TWILIO_SENDER_ID')]
-        private readonly string $twilioSenderId,
     ) {
     }
 
@@ -59,7 +56,6 @@ class FirstFactorTriggerAuthenticator extends AbstractAuthenticator implements A
 
         if ($user) {
             $this->smsProvider->send(
-                $this->twilioSenderId,
                 $phone,
                 sprintf('Votre code Messager : %s', $formattedCode),
             );

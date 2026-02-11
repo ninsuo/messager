@@ -33,24 +33,33 @@ class TriggerHandler
         }
 
         $types = $this->getMessageTypes($trigger);
+        $messageUuids = [];
+        $values = [];
+        $params = [];
+        $now = (new \DateTime())->format('Y-m-d H:i:s');
 
         foreach ($trigger->getContacts() as $contact) {
             foreach ($types as $type) {
-                $message = new Message();
-                $message->setUuid(Uuid::v4()->toRfc4122());
-                $message->setContact($contact);
-                $message->setType($type);
-                $message->setStatus(Message::STATUS_PENDING);
-                $trigger->addMessage($message);
+                $uuid = Uuid::v4()->toRfc4122();
+                $messageUuids[] = $uuid;
+
+                $values[] = '(?, ?, ?, ?, ?, ?)';
+                $params[] = $uuid;
+                $params[] = $trigger->getId();
+                $params[] = $contact->getId();
+                $params[] = $type;
+                $params[] = Message::STATUS_PENDING;
+                $params[] = $now;
             }
         }
 
-        $this->entityManager->flush();
+        if (\count($values) > 0) {
+            $query = 'INSERT INTO message (uuid, trigger_id, contact_id, type, status, created_at) VALUES '.implode(', ', $values);
+            $this->entityManager->getConnection()->executeStatement($query, $params);
+        }
 
-        foreach ($trigger->getMessages() as $message) {
-            if (Message::STATUS_PENDING === $message->getStatus()) {
-                $this->messageBus->dispatch(new SendMessage($message->getUuid()));
-            }
+        foreach ($messageUuids as $messageUuid) {
+            $this->messageBus->dispatch(new SendMessage($messageUuid));
         }
     }
 

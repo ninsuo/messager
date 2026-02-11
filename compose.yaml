@@ -54,6 +54,10 @@ services:
     environment:
       APP_ENV: ${APP_ENV:-prod}
 
+  worker4:
+    environment:
+      APP_ENV: ${APP_ENV:-prod}
+
   cron:
     depends_on:
       - mysql

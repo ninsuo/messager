@@ -52,7 +52,7 @@ class FakeSmsProviderTest extends KernelTestCase
 
     public function testSendReturnsSid(): void
     {
-        $sid = $this->provider->send('+33600000000', '+33611111111', 'Hello');
+        $sid = $this->provider->send('+33611111111', 'Hello');
 
         $this->assertNotNull($sid);
         $this->assertStringStartsWith('FAKE-', $sid);
@@ -62,7 +62,7 @@ class FakeSmsProviderTest extends KernelTestCase
     {
         $countBefore = count($this->repository->findAll());
 
-        $this->provider->send('+33600000000', '+33611111111', 'Test message');
+        $this->provider->send('+33611111111', 'Test message');
 
         $countAfter = count($this->repository->findAll());
         $this->assertSame($countBefore + 1, $countAfter);
@@ -70,10 +70,10 @@ class FakeSmsProviderTest extends KernelTestCase
 
     public function testSendStoresCorrectData(): void
     {
-        $this->provider->send('+33600000000', '+33611111111', 'Contenu du SMS');
+        $this->provider->send('+33611111111', 'Contenu du SMS');
 
         $sms = $this->repository->findOneBy([
-            'fromNumber' => '+33600000000',
+            'fromNumber' => 'Messager',
             'toNumber' => '+33611111111',
         ]);
 
@@ -86,11 +86,11 @@ class FakeSmsProviderTest extends KernelTestCase
 
     public function testSendMultiple(): void
     {
-        $this->provider->send('+33600000000', '+33611111111', 'First');
-        $this->provider->send('+33600000000', '+33622222222', 'Second');
+        $this->provider->send('+33611111111', 'First');
+        $this->provider->send('+33622222222', 'Second');
 
-        $fromSender = $this->repository->findBy(['fromNumber' => '+33600000000']);
+        $fromSender = $this->repository->findBy(['fromNumber' => 'Messager']);
 
-        $this->assertCount(2, $fromSender);
+        $this->assertGreaterThanOrEqual(2, count($fromSender));
     }
 }

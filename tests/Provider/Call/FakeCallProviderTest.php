@@ -69,7 +69,7 @@ class FakeCallProviderTest extends KernelTestCase
 
     public function testSendReturnsSid(): void
     {
-        $sid = $this->provider->send('+33600000000', '+33611111111');
+        $sid = $this->provider->send('+33611111111');
 
         $this->assertNotNull($sid);
         $this->assertStringStartsWith('FAKE-', $sid);
@@ -79,7 +79,7 @@ class FakeCallProviderTest extends KernelTestCase
     {
         $countBefore = count($this->repository->findAll());
 
-        $this->provider->send('+33600000000', '+33611111111');
+        $this->provider->send('+33611111111');
 
         $countAfter = count($this->repository->findAll());
         $this->assertSame($countBefore + 1, $countAfter);
@@ -87,10 +87,9 @@ class FakeCallProviderTest extends KernelTestCase
 
     public function testSendStoresCorrectData(): void
     {
-        $this->provider->send('+33600000000', '+33611111111');
+        $this->provider->send('+33611111111');
 
         $call = $this->repository->findOneBy([
-            'fromNumber' => '+33600000000',
             'toNumber' => '+33611111111',
         ]);
 
@@ -119,11 +118,11 @@ class FakeCallProviderTest extends KernelTestCase
 
     public function testSendMultiple(): void
     {
-        $this->provider->send('+33600000000', '+33611111111');
-        $this->provider->send('+33600000000', '+33622222222');
+        $this->provider->send('+33611111111');
+        $this->provider->send('+33622222222');
 
-        $fromSender = $this->repository->findBy(['fromNumber' => '+33600000000']);
+        $calls = $this->repository->findBy(['toNumber' => '+33622222222']);
 
-        $this->assertCount(2, $fromSender);
+        $this->assertCount(1, $calls);
     }
 }
