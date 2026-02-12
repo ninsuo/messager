@@ -46,6 +46,7 @@ services:
       target: base
     volumes:
       - asset_data:/var/www/public/assets
+      - ./.env.prod.local:/var/www/.env.prod.local:ro
     deploy:
       restart_policy:
         condition: any
@@ -57,6 +58,8 @@ services:
       target: worker
     depends_on:
       - mysql
+    volumes:
+      - ./.env.prod.local:/var/www/.env.prod.local:ro
     deploy:
       restart_policy:
         condition: any
@@ -68,6 +71,8 @@ services:
       target: worker
     depends_on:
       - mysql
+    volumes:
+      - ./.env.prod.local:/var/www/.env.prod.local:ro
     deploy:
       restart_policy:
         condition: any
@@ -79,6 +84,8 @@ services:
       target: worker
     depends_on:
       - mysql
+    volumes:
+      - ./.env.prod.local:/var/www/.env.prod.local:ro
     deploy:
       restart_policy:
         condition: any
@@ -90,6 +97,8 @@ services:
       target: worker
     depends_on:
       - mysql
+    volumes:
+      - ./.env.prod.local:/var/www/.env.prod.local:ro
     deploy:
       restart_policy:
         condition: any
@@ -99,6 +108,8 @@ services:
       context: .
       dockerfile: docker/php/Dockerfile.prod
       target: cron
+    volumes:
+      - ./.env.prod.local:/var/www/.env.prod.local:ro
     deploy:
       restart_policy:
         condition: any
