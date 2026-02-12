@@ -1,0 +1,15 @@
+.git
+.gitignore
+.dockerignore
+.env.*.local
+.env.local
+var/
+vendor/
+public/assets/
+node_modules/
+tests/
+docker-data/
+CLAUDE.md
+GEMINI.md
+scripts/
+Makefile

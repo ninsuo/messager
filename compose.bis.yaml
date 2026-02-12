@@ -1,0 +1,13 @@
+# =============================================================================
+# Messager - Survival Mode (bis) overrides
+# =============================================================================
+#
+# Only overrides the Caddy configuration for the bis domain.
+# Resources are now identical to production (e2-medium).
+# =============================================================================
+
+services:
+
+  caddy:
+    volumes:
+      - ./docker/caddy/Caddyfile.bis:/etc/caddy/Caddyfile

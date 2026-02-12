@@ -1,23 +1,11 @@
 # =============================================================================
 # Messager - Production overrides
 # =============================================================================
-#
-# Start the production stack:
-#   docker compose -f compose.yaml -f compose.prod.yaml up -d
-#
-# Rebuild after a code change:
-#   docker compose -f compose.yaml -f compose.prod.yaml up -d --build
-#
-# The app is available at:
-#   https://www.messager.org
-#
-# Caddy obtains TLS certificates automatically via Let's Encrypt (HTTP-01).
-# Ports 80 and 443 are exposed on standard ports for ACME challenge compatibility.
-# =============================================================================
 
 services:
 
   mysql:
+    image: mysql:8.0
     volumes:
       - /mnt/data/mysql:/var/lib/mysql
     deploy:
@@ -25,9 +13,7 @@ services:
         condition: any
 
   caddy:
-    build:
-      context: .
-      dockerfile: docker/caddy/Dockerfile.prod
+    image: europe-west9-docker.pkg.dev/messager-486910/messager-repo/caddy:latest
     ports:
       - "80:80"
       - "443:443"
@@ -40,65 +26,58 @@ services:
         condition: any
 
   php:
-    build:
-      context: .
-      dockerfile: docker/php/Dockerfile.prod
-      target: base
+    image: europe-west9-docker.pkg.dev/messager-486910/messager-repo/php-base:latest
     volumes:
       - asset_data:/var/www/public/assets
+      - ./.env.prod.local:/var/www/.env.prod.local:ro
     deploy:
       restart_policy:
         condition: any
 
   worker1:
-    build:
-      context: .
-      dockerfile: docker/php/Dockerfile.prod
-      target: worker
+    image: europe-west9-docker.pkg.dev/messager-486910/messager-repo/php-worker:latest
     depends_on:
       - mysql
+    volumes:
+      - ./.env.prod.local:/var/www/.env.prod.local:ro
     deploy:
       restart_policy:
         condition: any
 
   worker2:
-    build:
-      context: .
-      dockerfile: docker/php/Dockerfile.prod
-      target: worker
+    image: europe-west9-docker.pkg.dev/messager-486910/messager-repo/php-worker:latest
     depends_on:
       - mysql
+    volumes:
+      - ./.env.prod.local:/var/www/.env.prod.local:ro
     deploy:
       restart_policy:
         condition: any
 
   worker3:
-    build:
-      context: .
-      dockerfile: docker/php/Dockerfile.prod
-      target: worker
+    image: europe-west9-docker.pkg.dev/messager-486910/messager-repo/php-worker:latest
     depends_on:
       - mysql
+    volumes:
+      - ./.env.prod.local:/var/www/.env.prod.local:ro
     deploy:
       restart_policy:
         condition: any
 
   worker4:
-    build:
-      context: .
-      dockerfile: docker/php/Dockerfile.prod
-      target: worker
+    image: europe-west9-docker.pkg.dev/messager-486910/messager-repo/php-worker:latest
     depends_on:
       - mysql
+    volumes:
+      - ./.env.prod.local:/var/www/.env.prod.local:ro
     deploy:
       restart_policy:
         condition: any
 
   cron:
-    build:
-      context: .
-      dockerfile: docker/php/Dockerfile.prod
-      target: cron
+    image: europe-west9-docker.pkg.dev/messager-486910/messager-repo/php-cron:latest
+    volumes:
+      - ./.env.prod.local:/var/www/.env.prod.local:ro
     deploy:
       restart_policy:
         condition: any
