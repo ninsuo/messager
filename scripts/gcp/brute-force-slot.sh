@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # --- Configuration ---
-ZONE="europe-west9-a"
-NEW_VM_NAME="messager-std-final"
-MACHINE_TYPE="e2-standard-2"
+ZONE="europe-west9-b"
+NEW_VM_NAME="messager-std-bis"
+MACHINE_TYPE="e2-micro"
 ATTEMPT=1
 
 echo "🚀 Lancement du mode Brute-Force pour le slot Standard..."
@@ -28,11 +28,14 @@ while true; do
         echo "👉 Tu peux maintenant lancer 'sh scripts/gcp/switch-data.sh'."
         exit 0
     else
-        # On vérifie si c'est bien une erreur de stock
+        # On vérifie si c'est une erreur de stock
         if grep -q "ZONE_RESOURCE_POOL_EXHAUSTED" last_error.txt; then
             echo "❌ Zone toujours saturée. Pause de 30s..."
+        # On vérifie si c'est une erreur réseau (DNS/Connection)
+        elif grep -qE "ConnectionError|nodename nor servname" last_error.txt; then
+            echo "🌐 Erreur réseau locale détectée. On ne lâche rien, retry dans 30s..."
         else
-            echo "⚠️  Autre erreur détectée :"
+            echo "⚠️  Autre erreur critique détectée :"
             cat last_error.txt
             echo "Arrêt par sécurité."
             exit 1
