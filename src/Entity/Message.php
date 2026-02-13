@@ -42,6 +42,9 @@ class Message
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $error = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTime $sentAt = null;
+
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTime $createdAt = null;
 
@@ -122,6 +125,18 @@ class Message
         return $this;
     }
 
+    public function getSentAt(): ?\DateTime
+    {
+        return $this->sentAt;
+    }
+
+    public function setSentAt(?\DateTime $sentAt): static
+    {
+        $this->sentAt = $sentAt;
+
+        return $this;
+    }
+
     public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
@@ -132,6 +147,15 @@ class Message
         $this->createdAt = $createdAt;
 
         return $this;
+    }
+
+    public function getDuration(): ?\DateInterval
+    {
+        if (null === $this->createdAt || null === $this->sentAt) {
+            return null;
+        }
+
+        return $this->createdAt->diff($this->sentAt);
     }
 
     #[ORM\PrePersist]

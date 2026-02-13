@@ -43,6 +43,8 @@ class TriggerFixture extends Fixture implements DependentFixtureInterface
             $message->setUuid(Uuid::v4()->toRfc4122());
             $message->setContact($contact);
             $message->setStatus(Message::STATUS_SENT);
+            $message->setCreatedAt(new \DateTime('-1 minute'));
+            $message->setSentAt(new \DateTime('-45 seconds'));
             $smsTrigger->addMessage($message);
         }
 
@@ -63,6 +65,8 @@ class TriggerFixture extends Fixture implements DependentFixtureInterface
             $message->setUuid(Uuid::v4()->toRfc4122());
             $message->setContact($contact);
             $message->setStatus(Message::STATUS_SENT);
+            $message->setCreatedAt(new \DateTime('-2 minutes'));
+            $message->setSentAt(new \DateTime('-1 minute 30 seconds'));
             $callTrigger->addMessage($message);
         }
 
@@ -83,12 +87,15 @@ class TriggerFixture extends Fixture implements DependentFixtureInterface
         $msgOk->setUuid(Uuid::v4()->toRfc4122());
         $msgOk->setContact($contact3);
         $msgOk->setStatus(Message::STATUS_SENT);
+        $msgOk->setCreatedAt(new \DateTime('-5 minutes'));
+        $msgOk->setSentAt(new \DateTime('-4 minutes 50 seconds'));
         $errorTrigger->addMessage($msgOk);
 
         $msgErr1 = new Message();
         $msgErr1->setUuid(Uuid::v4()->toRfc4122());
         $msgErr1->setContact($contact4);
         $msgErr1->setStatus(Message::STATUS_FAILED);
+        $msgErr1->setCreatedAt(new \DateTime('-5 minutes'));
         $msgErr1->setError('Undeliverable: invalid number');
         $errorTrigger->addMessage($msgErr1);
 
@@ -96,6 +103,7 @@ class TriggerFixture extends Fixture implements DependentFixtureInterface
         $msgErr2->setUuid(Uuid::v4()->toRfc4122());
         $msgErr2->setContact($contact5);
         $msgErr2->setStatus(Message::STATUS_FAILED);
+        $msgErr2->setCreatedAt(new \DateTime('-5 minutes'));
         $msgErr2->setError('Carrier rejected');
         $errorTrigger->addMessage($msgErr2);
 

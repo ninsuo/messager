@@ -35,6 +35,7 @@ class SendMessageHandlerTest extends KernelTestCase
         $em->refresh($message);
 
         $this->assertSame(Message::STATUS_SENT, $message->getStatus());
+        $this->assertNotNull($message->getSentAt());
         $this->assertNull($message->getError());
     }
 
@@ -53,6 +54,7 @@ class SendMessageHandlerTest extends KernelTestCase
         $em->refresh($message);
 
         $this->assertSame(Message::STATUS_SENT, $message->getStatus());
+        $this->assertNotNull($message->getSentAt());
         $this->assertNull($message->getError());
     }
 

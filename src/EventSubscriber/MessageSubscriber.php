@@ -130,6 +130,7 @@ class MessageSubscriber implements EventSubscriberInterface
         }
 
         $message->setStatus(Message::STATUS_DELIVERED);
+        $message->setSentAt(new \DateTime());
         $this->entityManager->flush();
 
         $event->setResponse($response);

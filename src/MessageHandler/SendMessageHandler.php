@@ -70,6 +70,7 @@ class SendMessageHandler
             }
 
             $message->setStatus(Message::STATUS_SENT);
+            $message->setSentAt(new \DateTime());
         } catch (\Throwable $e) {
             $message->setStatus(Message::STATUS_FAILED);
             $message->setError(mb_substr($e->getMessage(), 0, 255));
