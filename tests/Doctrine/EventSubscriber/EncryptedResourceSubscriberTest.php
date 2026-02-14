@@ -3,8 +3,8 @@
 namespace App\Tests\Doctrine\EventSubscriber;
 
 use App\Doctrine\EventSubscriber\EncryptedResourceSubscriber;
-use App\Entity\TwilioMessage;
-use App\Repository\TwilioMessageRepository;
+use App\Entity\Twilio\TwilioMessage;
+use App\Repository\Twilio\TwilioMessageRepository;
 use App\Tool\Encryption;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;

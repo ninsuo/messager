@@ -2,7 +2,7 @@
 
 namespace App\Tests\EventSubscriber;
 
-use App\Entity\TwilioCall;
+use App\Entity\Twilio\TwilioCall;
 use App\Event\TwilioCallEvent;
 use App\Event\TwilioEvent;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;

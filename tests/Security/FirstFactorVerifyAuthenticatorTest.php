@@ -2,7 +2,7 @@
 
 namespace App\Tests\Security;
 
-use App\Repository\FakeSmsRepository;
+use App\Repository\Fake\FakeSmsRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class FirstFactorVerifyAuthenticatorTest extends WebTestCase

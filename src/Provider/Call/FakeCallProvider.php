@@ -2,11 +2,11 @@
 
 namespace App\Provider\Call;
 
-use App\Entity\FakeCall;
-use App\Entity\TwilioCall;
+use App\Entity\Fake\FakeCall;
+use App\Entity\Twilio\TwilioCall;
 use App\Event\TwilioCallEvent;
 use App\Event\TwilioEvent;
-use App\Repository\FakeCallRepository;
+use App\Repository\Fake\FakeCallRepository;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;

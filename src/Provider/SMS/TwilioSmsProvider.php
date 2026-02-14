@@ -2,7 +2,7 @@
 
 namespace App\Provider\SMS;
 
-use App\Manager\TwilioMessageManager;
+use App\Manager\Twilio\TwilioMessageManager;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 readonly class TwilioSmsProvider implements SmsProvider

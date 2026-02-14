@@ -5,8 +5,6 @@ namespace App\Controller;
 use App\Form\VerifyCodeFormType;
 use App\Manager\UnguessableCodeManager;
 use App\Provider\Call\CallProvider;
-use App\Repository\FakeCallRepository;
-use App\Twig\TwimlExtension;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;

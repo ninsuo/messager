@@ -2,8 +2,8 @@
 
 namespace App\Provider\SMS;
 
-use App\Entity\FakeSms;
-use App\Repository\FakeSmsRepository;
+use App\Entity\Fake\FakeSms;
+use App\Repository\Fake\FakeSmsRepository;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 readonly class FakeSmsProvider implements SmsProvider

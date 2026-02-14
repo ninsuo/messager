@@ -140,7 +140,4 @@ make deploy-prod
 
 # Vérifier les logs Caddy (Certificat SSL)
 ssh messager-std-prod "sudo docker compose -f ~/messager/compose.yaml -f ~/messager/compose.prod.yaml logs -f caddy"
-
 ```
-
-``

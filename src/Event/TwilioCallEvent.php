@@ -2,7 +2,7 @@
 
 namespace App\Event;
 
-use App\Entity\TwilioCall;
+use App\Entity\Twilio\TwilioCall;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\Event;
 use Twilio\TwiML\VoiceResponse;

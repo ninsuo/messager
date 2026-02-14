@@ -4,8 +4,8 @@ namespace App\Tests\EventSubscriber;
 
 use App\Entity\Message;
 use App\Entity\Trigger;
-use App\Entity\TwilioCall;
-use App\Entity\TwilioMessage;
+use App\Entity\Twilio\TwilioCall;
+use App\Entity\Twilio\TwilioMessage;
 use App\Event\TwilioCallEvent;
 use App\Event\TwilioEvent;
 use App\Event\TwilioMessageEvent;

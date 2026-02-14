@@ -2,8 +2,8 @@
 
 namespace App\Tests\Security;
 
-use App\Entity\FakeSms;
-use App\Repository\FakeSmsRepository;
+use App\Entity\Fake\FakeSms;
+use App\Repository\Fake\FakeSmsRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 

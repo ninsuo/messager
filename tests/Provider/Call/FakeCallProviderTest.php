@@ -2,10 +2,10 @@
 
 namespace App\Tests\Provider\Call;
 
-use App\Entity\FakeCall;
+use App\Entity\Fake\FakeCall;
 use App\Provider\Call\CallProvider;
 use App\Provider\Call\FakeCallProvider;
-use App\Repository\FakeCallRepository;
+use App\Repository\Fake\FakeCallRepository;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class FakeCallProviderTest extends KernelTestCase

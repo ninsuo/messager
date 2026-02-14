@@ -2,7 +2,7 @@
 
 namespace App\Provider\Call;
 
-use App\Manager\TwilioCallManager;
+use App\Manager\Twilio\TwilioCallManager;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 readonly class TwilioCallProvider implements CallProvider

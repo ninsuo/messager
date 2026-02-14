@@ -2,11 +2,11 @@
 
 namespace App\Controller;
 
-use App\Entity\FakeCall;
+use App\Entity\Fake\FakeCall;
 use App\Event\TwilioEvent;
 use App\Provider\Call\FakeCallProvider;
-use App\Repository\FakeCallRepository;
-use App\Repository\FakeSmsRepository;
+use App\Repository\Fake\FakeCallRepository;
+use App\Repository\Fake\FakeSmsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\When;
 use Symfony\Component\HttpFoundation\Request;

@@ -2,8 +2,8 @@
 
 namespace App\Tests\Controller;
 
-use App\Repository\FakeCallRepository;
-use App\Repository\FakeSmsRepository;
+use App\Repository\Fake\FakeCallRepository;
+use App\Repository\Fake\FakeSmsRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 

@@ -2,9 +2,9 @@
 
 namespace App\Tests\Provider\SMS;
 
-use App\Entity\FakeSms;
+use App\Entity\Fake\FakeSms;
 use App\Provider\SMS\SmsProvider;
-use App\Repository\FakeSmsRepository;
+use App\Repository\Fake\FakeSmsRepository;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class FakeSmsProviderTest extends KernelTestCase

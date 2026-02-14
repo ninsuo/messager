@@ -2,10 +2,9 @@
 
 namespace App\Tests\Controller;
 
-use App\Entity\FakeCall;
-use App\Entity\FakeSms;
-use App\Repository\FakeCallRepository;
-use App\Repository\FakeSmsRepository;
+use App\Entity\Fake\FakeCall;
+use App\Repository\Fake\FakeCallRepository;
+use App\Repository\Fake\FakeSmsRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class SandboxControllerTest extends WebTestCase

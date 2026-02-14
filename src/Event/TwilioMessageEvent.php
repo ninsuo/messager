@@ -2,7 +2,7 @@
 
 namespace App\Event;
 
-use App\Entity\TwilioMessage;
+use App\Entity\Twilio\TwilioMessage;
 use Symfony\Contracts\EventDispatcher\Event;
 use Twilio\TwiML\MessagingResponse;
 
