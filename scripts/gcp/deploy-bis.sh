@@ -14,37 +14,31 @@ COMPOSE_FILES="-f compose.yaml -f compose.prod.yaml -f compose.bis.yaml"
 
 echo "Deploying to SURVIVAL instance $DESTINATION..."
 
-# 1. Sync Files
-echo "Syncing files..."
-rsync -avz --exclude-from='.gitignore' \
-    --exclude='.git/' \
-    --exclude='.claude/' \
-    --exclude='.idea/' \
-    --exclude='.phpunit.cache/' \
-    --exclude='var/' \
-    --exclude='node_modules/' \
-    --exclude='docker-data/' \
-    --exclude='.env.local' \
-    --exclude='.env.test' \
-    --exclude='.env.prod.local' \
-    --exclude='.env.bis.local' \
-    --exclude='CLAUDE.md' \
+# 1. Sync Orchestration Files
+echo "Syncing orchestration files (Whitelist)..."
+rsync -avz --delete --delete-excluded \
+    --include='/compose.yaml' \
+    --include='/compose.prod.yaml' \
+    --include='/compose.bis.yaml' \
+    --include='/.env' \
+    --include='/docker/' \
+    --exclude='/docker/*/data/' \
+    --exclude='/docker/*/data/**' \
+    --exclude='/docker/*/logs/' \
+    --exclude='/docker/*/logs/**' \
+    --exclude='/docker/*/config/' \
+    --exclude='/docker/*/config/**' \
+    --include='/docker/**' \
+    --include='/.env.prod.local' \
+    --include='/.env.bis.local' \
+    --exclude='*' \
     . "$DESTINATION:$APP_DIR"
 
 # 2. Sync and Merge Secrets
-echo "Syncing and merging secrets..."
-if [ -f .env.prod.local ]; then
-    rsync -avz .env.prod.local "$DESTINATION:$APP_DIR/.env.prod.local"
-else
-    echo "⚠️ Warning: .env.prod.local not found locally."
-fi
-
+echo "Merging secrets..."
 if [ -f .env.bis.local ]; then
     echo "Appending .env.bis.local to .env.prod.local on remote..."
-    rsync -avz .env.bis.local "$DESTINATION:$APP_DIR/.env.bis.local"
     ssh "$DESTINATION" "cat $APP_DIR/.env.bis.local >> $APP_DIR/.env.prod.local && rm $APP_DIR/.env.bis.local"
-else
-    echo "⚠️ Warning: .env.bis.local not found locally."
 fi
 
 # 3. SSH and Pull/Deploy
@@ -60,6 +54,6 @@ echo "Waiting for stack to stabilize..."
 sleep 15
 echo "Running migrations..."
 ssh "$DESTINATION" "cd $APP_DIR && \
-    sudo docker compose --env-file .env --env-file .env.prod.local exec -T php bin/console doctrine:migrations:migrate --no-interaction"
+    sudo docker compose --env-file .env --env-file .env.prod.local $COMPOSE_FILES exec -T php bin/console doctrine:migrations:migrate --no-interaction"
 
 echo "Survival deployment complete!"

@@ -16,28 +16,30 @@ COMPOSE_FILES="-f compose.yaml -f compose.prod.yaml"
 
 echo "🚀 DEPLOYMENT : Envoi vers $DESTINATION..."
 
-# 1. Sync Files
-# On garde l'exclusion de scripts/ pour la prod, sauf si tu en as besoin là-bas
-echo "📦 Synchronisation des fichiers..."
-rsync -avz --exclude-from='.gitignore' \
-    --exclude='.git/' \
-    --exclude='.claude/' \
-    --exclude='.idea/' \
-    --exclude='.phpunit.cache/' \
-    --exclude='var/' \
-    --exclude='node_modules/' \
-    --exclude='docker-data/' \
-    --exclude='.env.local' \
-    --exclude='.env.test' \
-    --exclude='CLAUDE.md' \
+# 1. Sync Orchestration Files
+# We use a whitelist approach: only sync what's needed for docker-compose to run.
+# --delete-excluded ensures that any files on the remote not matching our includes are removed.
+echo "📦 Synchronisation des fichiers (Whitelist)..."
+rsync -avz --delete --delete-excluded \
+    --include='/compose.yaml' \
+    --include='/compose.prod.yaml' \
+    --include='/.env' \
+    --include='/docker/' \
+    --exclude='/docker/*/data/' \
+    --exclude='/docker/*/data/**' \
+    --exclude='/docker/*/logs/' \
+    --exclude='/docker/*/logs/**' \
+    --exclude='/docker/*/config/' \
+    --exclude='/docker/*/config/**' \
+    --include='/docker/**' \
+    --include='/.env.prod.local' \
+    --exclude='*' \
     . "$DESTINATION:$APP_DIR"
 
-# 2. Sync Secrets (Méthode propre : Écrase le fichier remote sans duplication)
+# 2. Sync Secrets (Double check in case .env.prod.local was not in the main rsync)
 if [ -f .env.prod.local ]; then
-    echo "🔑 Synchronisation des secrets (.env.prod.local)..."
+    echo "🔑 Vérification des secrets (.env.prod.local)..."
     rsync -avz .env.prod.local "$DESTINATION:$APP_DIR/.env.prod.local"
-else
-    echo "⚠️ Attention : .env.prod.local absent localement !"
 fi
 
 # 3. SSH : Pull & Up
