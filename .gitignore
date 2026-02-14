@@ -28,4 +28,5 @@ phpstan.neon
 /docker/caddy/logs/
 /docker/caddy/data/
 /docker/caddy/config/
+/docker/redis/data/
 ###< docker ###

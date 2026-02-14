@@ -32,6 +32,10 @@ services:
     volumes:
       - ./docker/mysql/my.cnf:/etc/my.cnf
 
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+
   caddy:
     depends_on:
       - php
@@ -39,6 +43,7 @@ services:
   php:
     depends_on:
       - mysql
+      - redis
     environment:
       APP_ENV: ${APP_ENV:-prod}
 

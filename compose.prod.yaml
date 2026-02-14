@@ -12,6 +12,13 @@ services:
       restart_policy:
         condition: any
 
+  redis:
+    volumes:
+      - /mnt/data/redis:/data
+    deploy:
+      restart_policy:
+        condition: any
+
   caddy:
     image: europe-west9-docker.pkg.dev/messager-486910/messager-repo/caddy:latest
     ports:
@@ -38,6 +45,7 @@ services:
     image: europe-west9-docker.pkg.dev/messager-486910/messager-repo/php-worker:latest
     depends_on:
       - mysql
+      - redis
     volumes:
       - ./.env.prod.local:/var/www/.env.prod.local:ro
     deploy:
@@ -48,6 +56,7 @@ services:
     image: europe-west9-docker.pkg.dev/messager-486910/messager-repo/php-worker:latest
     depends_on:
       - mysql
+      - redis
     volumes:
       - ./.env.prod.local:/var/www/.env.prod.local:ro
     deploy:
@@ -58,6 +67,7 @@ services:
     image: europe-west9-docker.pkg.dev/messager-486910/messager-repo/php-worker:latest
     depends_on:
       - mysql
+      - redis
     volumes:
       - ./.env.prod.local:/var/www/.env.prod.local:ro
     deploy:
@@ -68,6 +78,7 @@ services:
     image: europe-west9-docker.pkg.dev/messager-486910/messager-repo/php-worker:latest
     depends_on:
       - mysql
+      - redis
     volumes:
       - ./.env.prod.local:/var/www/.env.prod.local:ro
     deploy:

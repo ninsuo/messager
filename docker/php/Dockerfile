@@ -19,6 +19,11 @@ RUN docker-php-ext-install pdo \
     && docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install gd
 
+RUN apk add --no-cache --virtual .redis-deps autoconf make \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && apk del .redis-deps
+
 RUN cd /usr/local/etc/php/conf.d/ \
   && echo 'memory_limit = 2G' >> app.ini \
   && echo 'post_max_size = 20M' >> app.ini \
@@ -49,7 +54,7 @@ ENTRYPOINT ["php-fpm"]
 
 FROM base AS worker
 
-ENTRYPOINT ["php", "bin/console", "messenger:consume", "async", "-vv", "--time-limit=3600", "--sleep=0.5"]
+ENTRYPOINT ["php", "bin/console", "messenger:consume", "async", "-vv", "--time-limit=3600"]
 
 FROM base AS cron
 

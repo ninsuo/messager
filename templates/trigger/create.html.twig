@@ -44,8 +44,14 @@
 
                     <div class="d-none" data-book-save-target="contactFields">
                         <div class="mb-3 mt-3">
-                            <label for="{{ form.phones.vars.id }}" class="form-label fw-semibold">Numéros de téléphone</label>
-                            {{ form_widget(form.phones) }}
+                            <div class="d-flex align-items-center justify-content-between">
+                                <label for="{{ form.phones.vars.id }}" class="form-label fw-semibold mb-0">Numéros de téléphone</label>
+                                {% if app.environment == 'dev' %}
+                                    <button type="button" class="btn btn-outline-secondary btn-sm"
+                                            data-action="click->book-save#fillRandom">+ 1000 numéros</button>
+                                {% endif %}
+                            </div>
+                            {{ form_widget(form.phones, {attr: {'data-book-save-target': 'phones'}}) }}
                         </div>
 
                         <div class="form-check mb-2">
