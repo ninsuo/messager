@@ -10,6 +10,7 @@ use App\Provider\SMS\SmsProvider;
 use App\Repository\MessageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Twilio\Exceptions\RestException;
 
 #[AsMessageHandler]
 class SendMessageHandler
@@ -72,10 +73,33 @@ class SendMessageHandler
             $message->setStatus(Message::STATUS_SENT);
             $message->setSentAt(new \DateTime());
         } catch (\Throwable $e) {
+            if ($this->isRetryable($e)) {
+                $this->entityManager->flush();
+
+                throw $e;
+            }
+
             $message->setStatus(Message::STATUS_FAILED);
             $message->setError(mb_substr($e->getMessage(), 0, 255));
         }
 
         $this->entityManager->flush();
+    }
+
+    private function isRetryable(\Throwable $e): bool
+    {
+        if ($e instanceof RestException) {
+            $status = $e->getStatusCode();
+
+            // 429 Too Many Requests or 5xx server errors are transient
+            return 429 === $status || $status >= 500;
+        }
+
+        // Network errors (curl timeouts, connection refused) are retryable
+        if ($e instanceof \Twilio\Exceptions\TwilioException) {
+            return true;
+        }
+
+        return false;
     }
 }

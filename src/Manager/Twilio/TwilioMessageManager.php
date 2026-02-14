@@ -121,6 +121,10 @@ class TwilioMessageManager
                 'context' => $context,
                 'exception' => $e->getMessage(),
             ]);
+
+            $this->messageRepository->save($entity);
+
+            throw $e;
         }
 
         $this->messageRepository->save($entity);

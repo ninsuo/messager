@@ -28,32 +28,6 @@ class MessageSubscriberTest extends KernelTestCase
         $this->eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
     }
 
-    public function testMessageErrorSetsStatusFailed(): void
-    {
-        $user = $this->createUser('+33600500001');
-        $contact = $this->createContact('+33611500001');
-        $trigger = $this->createTrigger($user, Trigger::TYPE_SMS, 'Test SMS');
-        $trigger->addContact($contact);
-        $message = $this->createMessage($trigger, $contact);
-
-        $twilioMessage = new TwilioMessage();
-        $twilioMessage->setUuid(Uuid::v4()->toRfc4122());
-        $twilioMessage->setDirection(TwilioMessage::DIRECTION_OUTBOUND);
-        $twilioMessage->setFromNumber('+33700000000');
-        $twilioMessage->setToNumber('+33611500001');
-        $twilioMessage->setContext(['message_uuid' => $message->getUuid()]);
-        $twilioMessage->setError('Carrier rejected');
-
-        $event = new TwilioMessageEvent($twilioMessage);
-        $this->eventDispatcher->dispatch($event, TwilioEvent::MESSAGE_ERROR);
-
-        $em = self::getContainer()->get(\Doctrine\ORM\EntityManagerInterface::class);
-        $em->refresh($message);
-
-        $this->assertSame(Message::STATUS_FAILED, $message->getStatus());
-        $this->assertSame('Carrier rejected', $message->getError());
-    }
-
     public function testStatusUpdatedSyncsToMessage(): void
     {
         $user = $this->createUser('+33600500091');
@@ -77,23 +51,6 @@ class MessageSubscriberTest extends KernelTestCase
         $em->refresh($message);
 
         $this->assertSame(Message::STATUS_DELIVERED, $message->getStatus());
-    }
-
-    public function testMessageErrorWithoutContextIsIgnored(): void
-    {
-        $twilioMessage = new TwilioMessage();
-        $twilioMessage->setUuid(Uuid::v4()->toRfc4122());
-        $twilioMessage->setDirection(TwilioMessage::DIRECTION_OUTBOUND);
-        $twilioMessage->setFromNumber('+33700000000');
-        $twilioMessage->setToNumber('+33611500002');
-        $twilioMessage->setError('Some error');
-
-        $event = new TwilioMessageEvent($twilioMessage);
-
-        // Should not throw
-        $this->eventDispatcher->dispatch($event, TwilioEvent::MESSAGE_ERROR);
-
-        $this->assertTrue(true);
     }
 
     public function testCallReceivedWithRecentMessagePlaysContent(): void
@@ -219,29 +176,4 @@ class MessageSubscriberTest extends KernelTestCase
         $this->assertSame(Message::STATUS_DELIVERED, $message->getStatus());
     }
 
-    public function testCallErrorSetsStatusFailed(): void
-    {
-        $user = $this->createUser('+33600500005');
-        $contact = $this->createContact('+33611500006');
-        $trigger = $this->createTrigger($user, Trigger::TYPE_CALL, 'Test error.');
-        $trigger->addContact($contact);
-        $message = $this->createMessage($trigger, $contact);
-
-        $call = new TwilioCall();
-        $call->setUuid(Uuid::v4()->toRfc4122());
-        $call->setDirection(TwilioCall::DIRECTION_OUTBOUND);
-        $call->setFromNumber('+33700000000');
-        $call->setToNumber('+33611500006');
-        $call->setContext(['message_uuid' => $message->getUuid()]);
-        $call->setError('Call failed: busy');
-
-        $event = new TwilioCallEvent($call);
-        $this->eventDispatcher->dispatch($event, TwilioEvent::CALL_ERROR);
-
-        $em = self::getContainer()->get(\Doctrine\ORM\EntityManagerInterface::class);
-        $em->refresh($message);
-
-        $this->assertSame(Message::STATUS_FAILED, $message->getStatus());
-        $this->assertSame('Call failed: busy', $message->getError());
-    }
 }

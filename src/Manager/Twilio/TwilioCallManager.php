@@ -117,6 +117,10 @@ class TwilioCallManager
                 'context' => $context,
                 'exception' => $e->getMessage(),
             ]);
+
+            $this->callRepository->save($entity);
+
+            throw $e;
         }
 
         $this->callRepository->save($entity);

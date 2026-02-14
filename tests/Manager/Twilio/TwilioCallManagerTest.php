@@ -379,8 +379,6 @@ class TwilioCallManagerTest extends TestCase
             ->expects($this->exactly(2))
             ->method('dispatch')
             ->willReturnCallback(function (TwilioCallEvent $event, string $eventName) {
-                // First dispatch: CALL_ESTABLISHED — no response set → triggers LogicException
-                // Second dispatch: CALL_ERROR — from the catch block
                 if ($eventName === TwilioEvent::CALL_ERROR) {
                     $this->assertSame('error', $event->getCall()->getStatus());
                 }
@@ -396,17 +394,23 @@ class TwilioCallManagerTest extends TestCase
                 return str_contains($ctx['exception'], 'no responses were provided');
             }));
 
+        $repository = $this->createMock(TwilioCallRepository::class);
+        $repository
+            ->expects($this->once())
+            ->method('save')
+            ->with($this->isInstanceOf(TwilioCall::class));
+
         $manager = $this->createManager(
-            $this->createStub(TwilioCallRepository::class),
+            $repository,
             $this->createStub(TwilioClient::class),
             $eventDispatcher,
             $logger,
         );
 
-        $entity = $manager->sendCall('+33612345678', '+33698765432');
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('no responses were provided');
 
-        $this->assertSame('error', $entity->getStatus());
-        $this->assertStringContainsString('no responses were provided', $entity->getError());
+        $manager->sendCall('+33612345678', '+33698765432');
     }
 
     public function testSendCallTwilioError(): void
@@ -457,11 +461,10 @@ class TwilioCallManagerTest extends TestCase
 
         $manager = $this->createManager($repository, $twilioClient, $eventDispatcher, $logger);
 
-        $entity = $manager->sendCall('+33612345678', '+33698765432');
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Twilio API error');
 
-        $this->assertSame('error', $entity->getStatus());
-        $this->assertSame('Twilio API error', $entity->getError());
-        $this->assertNull($entity->getSid());
+        $manager->sendCall('+33612345678', '+33698765432');
     }
 
     public function testSendCallAlwaysSavesEvenOnError(): void
@@ -480,6 +483,8 @@ class TwilioCallManagerTest extends TestCase
             $this->createStub(TwilioClient::class),
             $eventDispatcher,
         );
+
+        $this->expectException(\LogicException::class);
 
         $manager->sendCall('+33600000000', '+33611111111');
     }

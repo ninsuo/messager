@@ -414,11 +414,10 @@ class TwilioMessageManagerTest extends TestCase
 
         $manager = $this->createManager($repository, $twilioClient, $eventDispatcher, $router, $logger);
 
-        $entity = $manager->sendMessage('+33612345678', '+33698765432', 'This will fail');
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Twilio API error');
 
-        $this->assertSame('error', $entity->getStatus());
-        $this->assertSame('Twilio API error', $entity->getError());
-        $this->assertNull($entity->getSid());
+        $manager->sendMessage('+33612345678', '+33698765432', 'This will fail');
     }
 
     public function testSendMessageErrorTruncatesLongError(): void
@@ -434,16 +433,27 @@ class TwilioMessageManagerTest extends TestCase
         $eventDispatcher = $this->createStub(EventDispatcherInterface::class);
         $eventDispatcher->method('dispatch')->willReturnArgument(0);
 
-        $manager = $this->createManager(
-            $this->createStub(TwilioMessageRepository::class),
-            $twilioClient,
-            $eventDispatcher,
-            $router,
-        );
+        $savedEntity = null;
+        $repository = $this->createMock(TwilioMessageRepository::class);
+        $repository
+            ->expects($this->once())
+            ->method('save')
+            ->with($this->callback(function (TwilioMessage $entity) use (&$savedEntity) {
+                $savedEntity = $entity;
 
-        $entity = $manager->sendMessage('+33600000000', '+33611111111', 'long error');
+                return true;
+            }));
 
-        $this->assertSame(255, mb_strlen($entity->getError()));
+        $manager = $this->createManager($repository, $twilioClient, $eventDispatcher, $router);
+
+        try {
+            $manager->sendMessage('+33600000000', '+33611111111', 'long error');
+        } catch (\RuntimeException) {
+            // Expected — manager now re-throws
+        }
+
+        $this->assertNotNull($savedEntity);
+        $this->assertSame(255, mb_strlen($savedEntity->getError()));
     }
 
     public function testSendMessageAlwaysSavesEvenOnError(): void
@@ -464,6 +474,8 @@ class TwilioMessageManagerTest extends TestCase
             ->with($this->isInstanceOf(TwilioMessage::class));
 
         $manager = $this->createManager($repository, $twilioClient, $eventDispatcher, $router);
+
+        $this->expectException(\RuntimeException::class);
 
         $manager->sendMessage('+33600000000', '+33611111111', 'must save');
     }
