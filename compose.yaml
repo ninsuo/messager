@@ -50,18 +50,22 @@ services:
   worker1:
     environment:
       APP_ENV: ${APP_ENV:-prod}
+      MESSENGER_CONSUMER_NAME: worker1
 
   worker2:
     environment:
       APP_ENV: ${APP_ENV:-prod}
+      MESSENGER_CONSUMER_NAME: worker2
 
   worker3:
     environment:
       APP_ENV: ${APP_ENV:-prod}
+      MESSENGER_CONSUMER_NAME: worker3
 
   worker4:
     environment:
       APP_ENV: ${APP_ENV:-prod}
+      MESSENGER_CONSUMER_NAME: worker4
 
   cron:
     depends_on:
