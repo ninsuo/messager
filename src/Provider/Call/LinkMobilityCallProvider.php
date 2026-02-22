@@ -14,10 +14,9 @@ readonly class LinkMobilityCallProvider implements CallProvider
     ) {
     }
 
-    public function send(string $to, array $context = [], ?string $content = null): ?string
+    public function send(string $to, string $message, array $context = []): ?string
     {
-        $text = $content ?? '';
-        $repeated = implode('. Je répète. ', array_fill(0, 5, $text));
+        $repeated = implode('. Je répète. ', array_fill(0, 5, $message));
 
         $data = $this->client->send($to, $repeated, $this->serviceId);
 

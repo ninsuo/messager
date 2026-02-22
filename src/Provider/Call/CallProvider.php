@@ -9,5 +9,5 @@ interface CallProvider
      *
      * @return string|null The call SID
      */
-    public function send(string $to, array $context = [], ?string $content = null): ?string;
+    public function send(string $to, string $message, array $context = []): ?string;
 }

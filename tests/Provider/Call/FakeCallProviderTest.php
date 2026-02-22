@@ -52,7 +52,7 @@ class FakeCallProviderTest extends KernelTestCase
 
     public function testSendReturnsSid(): void
     {
-        $sid = $this->provider->send('+33611111111');
+        $sid = $this->provider->send('+33611111111', '');
 
         $this->assertNotNull($sid);
         $this->assertStringStartsWith('FAKE-', $sid);
@@ -62,7 +62,7 @@ class FakeCallProviderTest extends KernelTestCase
     {
         $countBefore = count($this->repository->findAll());
 
-        $this->provider->send('+33611111111');
+        $this->provider->send('+33611111111', '');
 
         $countAfter = count($this->repository->findAll());
         $this->assertSame($countBefore + 1, $countAfter);
@@ -70,7 +70,7 @@ class FakeCallProviderTest extends KernelTestCase
 
     public function testSendStoresCorrectData(): void
     {
-        $this->provider->send('+33611111111', [], 'Test content');
+        $this->provider->send('+33611111111', 'Test content');
 
         $call = $this->repository->findOneBy([
             'toNumber' => '+33611111111',
@@ -85,7 +85,7 @@ class FakeCallProviderTest extends KernelTestCase
 
     public function testSendWithAuthCodeBuildsCorrectTwiml(): void
     {
-        $this->provider->send('+33622222222', ['auth_code' => '123 456']);
+        $this->provider->send('+33622222222', '', ['auth_code' => '123 456']);
 
         $call = $this->repository->findOneBy([
             'toNumber' => '+33622222222',
@@ -98,8 +98,8 @@ class FakeCallProviderTest extends KernelTestCase
 
     public function testSendMultiple(): void
     {
-        $this->provider->send('+33611111111');
-        $this->provider->send('+33633333333');
+        $this->provider->send('+33611111111', '');
+        $this->provider->send('+33633333333', '');
 
         $calls = $this->repository->findBy(['toNumber' => '+33633333333']);
 

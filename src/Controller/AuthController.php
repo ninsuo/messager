@@ -66,7 +66,7 @@ class AuthController extends AbstractController
 
         $formattedCode = substr($code, 0, 3).' '.substr($code, 3);
 
-        $callProvider->send($phone, ['auth_code' => $formattedCode]);
+        $callProvider->send($phone, '', ['auth_code' => $formattedCode]);
 
         $session->set($sessionKey, time());
 

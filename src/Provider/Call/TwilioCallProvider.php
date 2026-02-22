@@ -22,12 +22,12 @@ readonly class TwilioCallProvider implements CallProvider
         );
     }
 
-    public function send(string $to, array $context = [], ?string $content = null): ?string
+    public function send(string $to, string $message, array $context = []): ?string
     {
         $from = $this->fromNumbers[array_rand($this->fromNumbers)];
-        $twiml = $this->buildTwiml($context, $content);
+        $twiml = $this->buildTwiml($message, $context);
 
-        $call = $this->twilio->createCall($to, $from, [
+        $call = $this->twilio->sendCall($to, $from, [
             'Twiml' => $twiml,
         ]);
 
@@ -37,7 +37,7 @@ readonly class TwilioCallProvider implements CallProvider
     /**
      * @param array<string, mixed> $context
      */
-    private function buildTwiml(array $context, ?string $content): string
+    private function buildTwiml(string $message, array $context): string
     {
         $response = new VoiceResponse();
 
@@ -60,10 +60,8 @@ readonly class TwilioCallProvider implements CallProvider
                 }
             }
         } else {
-            $text = $content ?? '';
-
             for ($i = 0; $i < 5; $i++) {
-                $response->say($text, ['language' => 'fr-FR', 'voice' => 'Polly.Lea']);
+                $response->say($message, ['language' => 'fr-FR', 'voice' => 'Polly.Lea']);
 
                 if ($i < 4) {
                     $response->pause(['length' => 2]);

@@ -30,7 +30,7 @@ class TwilioClient
     /**
      * @param array<string, mixed> $options
      */
-    public function createCall(string $to, string $from, array $options = []): CallInstance
+    public function sendCall(string $to, string $from, array $options = []): CallInstance
     {
         return $this->getClient()->calls->create($to, $from, $options);
     }

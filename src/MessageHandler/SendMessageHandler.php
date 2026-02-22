@@ -63,8 +63,8 @@ class SendMessageHandler
             } elseif (Trigger::TYPE_CALL === $messageType) {
                 $this->callProvider->send(
                     $toNumber,
+                    $trigger->getContent() ?? '',
                     $context,
-                    $trigger->getContent(),
                 );
             } else {
                 throw new \RuntimeException('Unsupported message type: ' . $messageType);

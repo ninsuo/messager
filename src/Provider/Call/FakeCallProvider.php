@@ -21,9 +21,9 @@ readonly class FakeCallProvider implements CallProvider
         $this->defaultFromNumber = str_starts_with($first, '+') ? $first : '+' . $first;
     }
 
-    public function send(string $to, array $context = [], ?string $content = null): ?string
+    public function send(string $to, string $message, array $context = []): ?string
     {
-        $twiml = $this->buildTwiml($context, $content);
+        $twiml = $this->buildTwiml($message, $context);
 
         $fakeCall = new FakeCall();
         $fakeCall->setFromNumber($this->defaultFromNumber);
@@ -39,7 +39,7 @@ readonly class FakeCallProvider implements CallProvider
     /**
      * @param array<string, mixed> $context
      */
-    private function buildTwiml(array $context, ?string $content): string
+    private function buildTwiml(string $message, array $context): string
     {
         $response = new VoiceResponse();
 
@@ -62,10 +62,8 @@ readonly class FakeCallProvider implements CallProvider
                 }
             }
         } else {
-            $text = $content ?? '';
-
             for ($i = 0; $i < 5; $i++) {
-                $response->say($text, ['language' => 'fr-FR', 'voice' => 'Polly.Lea']);
+                $response->say($message, ['language' => 'fr-FR', 'voice' => 'Polly.Lea']);
 
                 if ($i < 4) {
                     $response->pause(['length' => 2]);

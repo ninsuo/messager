@@ -20,7 +20,7 @@ class LinkMobilityCallProviderTest extends TestCase
 
         $provider = new LinkMobilityCallProvider($client, 99);
 
-        $result = $provider->send('+33612345678', [], 'Voice message content');
+        $result = $provider->send('+33612345678', 'Voice message content');
 
         $this->assertSame('voice-456', $result);
     }
@@ -37,7 +37,7 @@ class LinkMobilityCallProviderTest extends TestCase
 
         $provider = new LinkMobilityCallProvider($client, 99);
 
-        $result = $provider->send('+33612345678');
+        $result = $provider->send('+33612345678', '');
 
         $this->assertSame('voice-789', $result);
     }
@@ -51,7 +51,7 @@ class LinkMobilityCallProviderTest extends TestCase
 
         $provider = new LinkMobilityCallProvider($client, 99);
 
-        $result = $provider->send('+33612345678', [], 'Content');
+        $result = $provider->send('+33612345678', 'Content');
 
         $this->assertNull($result);
     }
