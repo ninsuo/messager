@@ -14,5 +14,4 @@ final class TwilioEvent
     public const CALL_ERROR = 'twilio.call_error';
     public const CALL_ANSWERING_MACHINE = 'twilio.call_answering_machine';
 
-    public const STATUS_UPDATED = 'twilio.status_updated';
 }

@@ -5,7 +5,6 @@ namespace App\EventSubscriber;
 use App\Entity\Message;
 use App\Event\TwilioCallEvent;
 use App\Event\TwilioEvent;
-use App\Event\TwilioMessageEvent;
 use App\Repository\ContactRepository;
 use App\Repository\MessageRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -24,31 +23,9 @@ class MessageSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            TwilioEvent::STATUS_UPDATED => 'onStatusUpdated',
             TwilioEvent::CALL_RECEIVED => 'onCallReceived',
             TwilioEvent::CALL_ESTABLISHED => 'onCallEstablished',
         ];
-    }
-
-    public function onStatusUpdated(TwilioMessageEvent $event): void
-    {
-        $message = $this->getMessageFromSmsEvent($event);
-
-        if (null === $message) {
-            return;
-        }
-
-        $twilioStatus = $event->getMessage()->getStatus();
-
-        // Map Twilio status to App status
-        if ('delivered' === $twilioStatus) {
-            $message->setStatus(Message::STATUS_DELIVERED);
-        } elseif ('failed' === $twilioStatus || 'undelivered' === $twilioStatus) {
-            $message->setStatus(Message::STATUS_FAILED);
-        }
-        // We can ignore other statuses like 'sent', 'queued' as they are intermediate
-
-        $this->entityManager->flush();
     }
 
     public function onCallReceived(TwilioCallEvent $event): void
@@ -114,23 +91,11 @@ class MessageSubscriber implements EventSubscriberInterface
             }
         }
 
-        $message->setStatus(Message::STATUS_DELIVERED);
+        $message->setStatus(Message::STATUS_SENT);
         $message->setSentAt(new \DateTime());
         $this->entityManager->flush();
 
         $event->setResponse($response);
-    }
-
-    private function getMessageFromSmsEvent(TwilioMessageEvent $event): ?Message
-    {
-        $context = $event->getMessage()->getContext();
-        $messageUuid = $context['message_uuid'] ?? null;
-
-        if (null === $messageUuid) {
-            return null;
-        }
-
-        return $this->messageRepository->findOneBy(['uuid' => $messageUuid]);
     }
 
     private function setNoActiveTriggersResponse(TwilioCallEvent $event): void

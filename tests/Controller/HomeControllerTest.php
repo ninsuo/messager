@@ -184,7 +184,7 @@ class HomeControllerTest extends WebTestCase
         $contact = $this->createContact('+33611000080');
         $trigger = $this->createTrigger($user, Trigger::TYPE_SMS, 'Status test');
         $message = $this->createMessage($trigger, $contact);
-        $message->setStatus(Message::STATUS_DELIVERED);
+        $message->setStatus(Message::STATUS_SENT);
         self::getContainer()->get(\App\Repository\MessageRepository::class)->save($message);
 
         $client->loginUser($user);
@@ -201,7 +201,7 @@ class HomeControllerTest extends WebTestCase
         $contact = $this->createContact('+33611000083');
         $trigger = $this->createTrigger($user, Trigger::TYPE_SMS, 'Progress test');
         $message = $this->createMessage($trigger, $contact);
-        $message->setStatus(Message::STATUS_DELIVERED);
+        $message->setStatus(Message::STATUS_SENT);
         self::getContainer()->get(\App\Repository\MessageRepository::class)->save($message);
 
         $client->loginUser($user);
@@ -253,7 +253,7 @@ class HomeControllerTest extends WebTestCase
         $contact = $this->createContact('+33611000086');
         $trigger = $this->createTrigger($user, Trigger::TYPE_SMS, 'Detail page test');
         $message = $this->createMessage($trigger, $contact);
-        $message->setStatus(Message::STATUS_DELIVERED);
+        $message->setStatus(Message::STATUS_SENT);
         self::getContainer()->get(\App\Repository\MessageRepository::class)->save($message);
 
         $client->loginUser($user);

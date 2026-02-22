@@ -32,7 +32,7 @@ class MessageRepositoryTest extends KernelTestCase
         $trigger->addContact($contact2);
 
         $m1 = $this->createMessage($trigger, $contact1);
-        $m1->setStatus(Message::STATUS_DELIVERED);
+        $m1->setStatus(Message::STATUS_SENT);
         $this->repository->save($m1);
 
         $m2 = $this->createMessage($trigger, $contact2);
@@ -45,8 +45,7 @@ class MessageRepositoryTest extends KernelTestCase
         $this->assertArrayHasKey($trigger->getId(), $counts);
         $triggerCounts = $counts[$trigger->getId()];
         $this->assertSame(0, $triggerCounts['pending']);
-        $this->assertSame(0, $triggerCounts['sent']);
-        $this->assertSame(1, $triggerCounts['delivered']);
+        $this->assertSame(1, $triggerCounts['sent']);
         $this->assertSame(1, $triggerCounts['failed']);
         $this->assertSame(2, $triggerCounts['total']);
     }
@@ -74,7 +73,7 @@ class MessageRepositoryTest extends KernelTestCase
         $this->repository->save($m1);
 
         $m2 = $this->createMessage($trigger, $contact2);
-        $m2->setStatus(Message::STATUS_DELIVERED);
+        $m2->setStatus(Message::STATUS_SENT);
         $this->repository->save($m2);
 
         $m3 = $this->createMessage($trigger, $contact3);
@@ -83,8 +82,7 @@ class MessageRepositoryTest extends KernelTestCase
         $counts = $this->repository->getStatusCountsByTrigger($trigger);
 
         $this->assertSame(1, $counts['pending']);
-        $this->assertSame(1, $counts['sent']);
-        $this->assertSame(1, $counts['delivered']);
+        $this->assertSame(2, $counts['sent']);
         $this->assertSame(0, $counts['failed']);
         $this->assertSame(3, $counts['total']);
     }
@@ -98,7 +96,6 @@ class MessageRepositoryTest extends KernelTestCase
 
         $this->assertSame(0, $counts['pending']);
         $this->assertSame(0, $counts['sent']);
-        $this->assertSame(0, $counts['delivered']);
         $this->assertSame(0, $counts['failed']);
         $this->assertSame(0, $counts['total']);
     }

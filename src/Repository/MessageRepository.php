@@ -32,7 +32,7 @@ class MessageRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array<int, array{pending: int, sent: int, delivered: int, failed: int, total: int}>
+     * @return array<int, array{pending: int, sent: int, failed: int, total: int}>
      */
     public function getStatusCountsByUser(User $user): array
     {
@@ -49,7 +49,7 @@ class MessageRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array<int, array{pending: int, sent: int, delivered: int, failed: int, total: int}>
+     * @return array<int, array{pending: int, sent: int, failed: int, total: int}>
      */
     public function getStatusCountsAll(): array
     {
@@ -63,7 +63,7 @@ class MessageRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array{pending: int, sent: int, delivered: int, failed: int, total: int}
+     * @return array{pending: int, sent: int, failed: int, total: int}
      */
     public function getStatusCountsByTrigger(Trigger $trigger): array
     {
@@ -77,12 +77,12 @@ class MessageRepository extends ServiceEntityRepository
 
         $counts = $this->buildStatusCounts($rows);
 
-        return $counts[$trigger->getId()] ?? ['pending' => 0, 'sent' => 0, 'delivered' => 0, 'failed' => 0, 'total' => 0];
+        return $counts[$trigger->getId()] ?? ['pending' => 0, 'sent' => 0, 'failed' => 0, 'total' => 0];
     }
 
     /**
      * @param array<int, array{trigger_id: int, status: string, cnt: int|string}> $rows
-     * @return array<int, array{pending: int, sent: int, delivered: int, failed: int, total: int}>
+     * @return array<int, array{pending: int, sent: int, failed: int, total: int}>
      */
     private function buildStatusCounts(array $rows): array
     {
@@ -91,7 +91,7 @@ class MessageRepository extends ServiceEntityRepository
         foreach ($rows as $row) {
             $triggerId = (int) $row['trigger_id'];
             if (!isset($counts[$triggerId])) {
-                $counts[$triggerId] = ['pending' => 0, 'sent' => 0, 'delivered' => 0, 'failed' => 0, 'total' => 0];
+                $counts[$triggerId] = ['pending' => 0, 'sent' => 0, 'failed' => 0, 'total' => 0];
             }
             $status = $row['status'];
             $cnt = (int) $row['cnt'];

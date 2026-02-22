@@ -1,4 +1,4 @@
-{% set has_active = (counts.pending > 0) or (counts.sent > 0) %}
+{% set has_active = counts.pending > 0 %}
 {% set is_recent = trigger.createdAt|date('U') > 'now'|date('U') - 10800 %}
 {% set is_initializing = counts.total == 0 and is_recent %}
 {% set should_poll = is_recent and (has_active or is_initializing) %}
@@ -34,17 +34,13 @@
                     <span class="text-muted"><span class="spinner-border spinner-border-sm me-1" role="status"></span> Préparation des messages…</span>
                 </div>
             {% elseif counts.total > 0 %}
-                {% set pct_delivered = (counts.delivered / counts.total * 100)|round(1) %}
                 {% set pct_sent = (counts.sent / counts.total * 100)|round(1) %}
                 {% set pct_failed = (counts.failed / counts.total * 100)|round(1) %}
-                {% set pct_pending = (100 - pct_delivered - pct_sent - pct_failed)|round(1) %}
+                {% set pct_pending = (100 - pct_sent - pct_failed)|round(1) %}
 
                 <div class="progress trigger-progress mt-2" role="progressbar">
-                    {% if pct_delivered > 0 %}
-                        <div class="progress-bar bg-success" style="width: {{ pct_delivered }}%"></div>
-                    {% endif %}
                     {% if pct_sent > 0 %}
-                        <div class="progress-bar bg-primary" style="width: {{ pct_sent }}%"></div>
+                        <div class="progress-bar bg-success" style="width: {{ pct_sent }}%"></div>
                     {% endif %}
                     {% if pct_failed > 0 %}
                         <div class="progress-bar bg-danger" style="width: {{ pct_failed }}%"></div>
@@ -55,11 +51,8 @@
                 </div>
 
                 <div class="trigger-status-legend mt-1">
-                    {% if pct_delivered > 0 %}
-                        <span><span class="trigger-status-dot bg-success"></span> {{ pct_delivered }}% distribué{{ pct_delivered > 1 ? 's' : '' }}</span>
-                    {% endif %}
                     {% if pct_sent > 0 %}
-                        <span><span class="trigger-status-dot bg-primary"></span> {{ pct_sent }}% envoyé{{ pct_sent > 1 ? 's' : '' }}</span>
+                        <span><span class="trigger-status-dot bg-success"></span> {{ pct_sent }}% envoyé{{ pct_sent > 1 ? 's' : '' }}</span>
                     {% endif %}
                     {% if pct_failed > 0 %}
                         <span><span class="trigger-status-dot bg-danger"></span> {{ pct_failed }}% échoué{{ pct_failed > 1 ? 's' : '' }}</span>

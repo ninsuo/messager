@@ -27,7 +27,7 @@
             {% else %}
                 <div class="trigger-list">
                     {% for trigger in triggers %}
-                        {% set counts = statusCounts[trigger.id] ?? {pending: 0, sent: 0, delivered: 0, failed: 0, total: 0} %}
+                        {% set counts = statusCounts[trigger.id] ?? {pending: 0, sent: 0, failed: 0, total: 0} %}
                         {% include 'home/_trigger_card.html.twig' with {trigger: trigger, counts: counts} only %}
                     {% endfor %}
                 </div>

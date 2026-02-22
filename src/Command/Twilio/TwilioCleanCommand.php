@@ -4,7 +4,6 @@ namespace App\Command\Twilio;
 
 use App\Entity\Twilio\TwilioCall;
 use App\Entity\Twilio\TwilioMessage;
-use App\Entity\Twilio\TwilioStatus;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -37,15 +36,10 @@ class TwilioCleanCommand extends Command
             'DELETE FROM ' . TwilioMessage::class . ' m WHERE m.createdAt < :cutoff'
         )->setParameter('cutoff', $cutoff)->execute();
 
-        $statuses = $this->entityManager->createQuery(
-            'DELETE FROM ' . TwilioStatus::class . ' s WHERE s.receivedAt < :cutoff'
-        )->setParameter('cutoff', $cutoff)->execute();
-
         $io->success(sprintf(
-            'Deleted %d call(s), %d message(s), %d status(es).',
+            'Deleted %d call(s), %d message(s).',
             $calls,
             $messages,
-            $statuses,
         ));
 
         return Command::SUCCESS;

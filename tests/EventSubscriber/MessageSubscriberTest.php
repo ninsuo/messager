@@ -5,10 +5,8 @@ namespace App\Tests\EventSubscriber;
 use App\Entity\Message;
 use App\Entity\Trigger;
 use App\Entity\Twilio\TwilioCall;
-use App\Entity\Twilio\TwilioMessage;
 use App\Event\TwilioCallEvent;
 use App\Event\TwilioEvent;
-use App\Event\TwilioMessageEvent;
 use App\Tests\Trait\EntityFactoryTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Uid\Uuid;
@@ -26,31 +24,6 @@ class MessageSubscriberTest extends KernelTestCase
         self::bootKernel();
 
         $this->eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
-    }
-
-    public function testStatusUpdatedSyncsToMessage(): void
-    {
-        $user = $this->createUser('+33600500091');
-        $contact = $this->createContact('+33611500091');
-        $trigger = $this->createTrigger($user, Trigger::TYPE_SMS, 'Test Status');
-        $trigger->addContact($contact);
-        $message = $this->createMessage($trigger, $contact);
-
-        $twilioMessage = new TwilioMessage();
-        $twilioMessage->setUuid(Uuid::v4()->toRfc4122());
-        $twilioMessage->setDirection(TwilioMessage::DIRECTION_OUTBOUND);
-        $twilioMessage->setFromNumber('+33700000000');
-        $twilioMessage->setToNumber('+33611500091');
-        $twilioMessage->setContext(['message_uuid' => $message->getUuid()]);
-        $twilioMessage->setStatus('delivered');
-
-        $event = new TwilioMessageEvent($twilioMessage);
-        $this->eventDispatcher->dispatch($event, TwilioEvent::STATUS_UPDATED);
-
-        $em = self::getContainer()->get(\Doctrine\ORM\EntityManagerInterface::class);
-        $em->refresh($message);
-
-        $this->assertSame(Message::STATUS_DELIVERED, $message->getStatus());
     }
 
     public function testCallReceivedWithRecentMessagePlaysContent(): void
@@ -86,10 +59,10 @@ class MessageSubscriberTest extends KernelTestCase
         $context = $call->getContext();
         $this->assertSame($message->getUuid(), $context['message_uuid']);
 
-        // Message should be marked as delivered
+        // Message should be marked as sent
         $em = self::getContainer()->get(\Doctrine\ORM\EntityManagerInterface::class);
         $em->refresh($message);
-        $this->assertSame(Message::STATUS_DELIVERED, $message->getStatus());
+        $this->assertSame(Message::STATUS_SENT, $message->getStatus());
     }
 
     public function testCallReceivedWithNoRecentMessagePlaysError(): void
@@ -173,7 +146,7 @@ class MessageSubscriberTest extends KernelTestCase
         $em = self::getContainer()->get(\Doctrine\ORM\EntityManagerInterface::class);
         $em->refresh($message);
 
-        $this->assertSame(Message::STATUS_DELIVERED, $message->getStatus());
+        $this->assertSame(Message::STATUS_SENT, $message->getStatus());
     }
 
 }
