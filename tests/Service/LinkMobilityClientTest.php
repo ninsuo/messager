@@ -22,7 +22,7 @@ class LinkMobilityClientTest extends TestCase
         ]));
 
         $httpClient = new MockHttpClient($mockResponse);
-        $client = new LinkMobilityClient($httpClient, self::API_KEY, self::API_SECRET, self::API_URL, self::SENDER);
+        $client = new LinkMobilityClient($httpClient, self::API_KEY, self::API_SECRET, self::API_URL, self::SENDER, 'none');
 
         $result = $client->send('+33612345678', 'Hello test', 42);
 
@@ -37,7 +37,7 @@ class LinkMobilityClientTest extends TestCase
         ]));
 
         $httpClient = new MockHttpClient($mockResponse);
-        $client = new LinkMobilityClient($httpClient, self::API_KEY, self::API_SECRET, self::API_URL, self::SENDER);
+        $client = new LinkMobilityClient($httpClient, self::API_KEY, self::API_SECRET, self::API_URL, self::SENDER, 'none');
 
         $client->send('+33612345678', 'Test message', 10);
 
@@ -80,7 +80,7 @@ class LinkMobilityClientTest extends TestCase
         ]));
 
         $httpClient = new MockHttpClient($mockResponse);
-        $client = new LinkMobilityClient($httpClient, self::API_KEY, self::API_SECRET, self::API_URL, self::SENDER);
+        $client = new LinkMobilityClient($httpClient, self::API_KEY, self::API_SECRET, self::API_URL, self::SENDER, 'none');
 
         $client->send('+33612345678', 'Test', 10, ['priority' => 512]);
 
@@ -97,7 +97,7 @@ class LinkMobilityClientTest extends TestCase
         ]));
 
         $httpClient = new MockHttpClient($mockResponse);
-        $client = new LinkMobilityClient($httpClient, self::API_KEY, self::API_SECRET, self::API_URL, self::SENDER);
+        $client = new LinkMobilityClient($httpClient, self::API_KEY, self::API_SECRET, self::API_URL, self::SENDER, 'none');
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('LINK Mobility API error 401: Unauthorized');
@@ -112,7 +112,7 @@ class LinkMobilityClientTest extends TestCase
         ]));
 
         $httpClient = new MockHttpClient($mockResponse);
-        $client = new LinkMobilityClient($httpClient, self::API_KEY, self::API_SECRET, self::API_URL, self::SENDER);
+        $client = new LinkMobilityClient($httpClient, self::API_KEY, self::API_SECRET, self::API_URL, self::SENDER, 'none');
 
         $this->expectException(\RuntimeException::class);
 

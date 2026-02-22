@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Twilio\Http\CurlClient;
 use Twilio\Rest\Api\V2010\Account\CallInstance;
 use Twilio\Rest\Api\V2010\Account\MessageInstance;
 use Twilio\Rest\Client;
@@ -16,6 +17,8 @@ class TwilioClient
         private readonly string $accountSid,
         #[Autowire(env: 'TWILIO_AUTH_TOKEN')]
         private readonly string $authToken,
+        #[Autowire(env: 'HTTP_PROXY')]
+        private readonly string $httpProxy,
     ) {
     }
 
@@ -37,6 +40,14 @@ class TwilioClient
 
     private function getClient(): Client
     {
-        return $this->client ??= new Client($this->accountSid, $this->authToken);
+        if (null === $this->client) {
+            $httpClient = 'none' !== $this->httpProxy
+                ? new CurlClient([\CURLOPT_PROXY => $this->httpProxy])
+                : null;
+
+            $this->client = new Client($this->accountSid, $this->authToken, httpClient: $httpClient);
+        }
+
+        return $this->client;
     }
 }

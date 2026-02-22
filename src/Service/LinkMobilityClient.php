@@ -7,8 +7,10 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class LinkMobilityClient
 {
+    private readonly HttpClientInterface $httpClient;
+
     public function __construct(
-        private readonly HttpClientInterface $httpClient,
+        HttpClientInterface $httpClient,
         #[Autowire(env: 'LINK_MOBILITY_API_KEY')]
         private readonly string $apiKey,
         #[Autowire(env: 'LINK_MOBILITY_API_SECRET')]
@@ -17,7 +19,12 @@ class LinkMobilityClient
         private readonly string $apiUrl,
         #[Autowire(env: 'LINK_MOBILITY_SENDER')]
         private readonly string $sender,
+        #[Autowire(env: 'HTTP_PROXY')]
+        string $httpProxy,
     ) {
+        $this->httpClient = 'none' !== $httpProxy
+            ? $httpClient->withOptions(['proxy' => $httpProxy])
+            : $httpClient;
     }
 
     /**
