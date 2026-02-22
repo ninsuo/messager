@@ -2,13 +2,13 @@
 
 namespace App\Provider\SMS;
 
-use App\Manager\Twilio\TwilioMessageManager;
+use App\Service\TwilioClient;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 readonly class TwilioSmsProvider implements SmsProvider
 {
     public function __construct(
-        private TwilioMessageManager $messageManager,
+        private TwilioClient $twilio,
         #[Autowire(env: 'TWILIO_SENDER_ID')]
         private string $senderId,
     ) {
@@ -16,8 +16,11 @@ readonly class TwilioSmsProvider implements SmsProvider
 
     public function send(string $to, string $message, array $context = []): ?string
     {
-        $twilioMessage = $this->messageManager->sendMessage($this->senderId, $to, $message, $context);
+        $outbound = $this->twilio->sendMessage($to, [
+            'from' => $this->senderId,
+            'body' => $message,
+        ]);
 
-        return $twilioMessage->getSid();
+        return $outbound->sid;
     }
 }
