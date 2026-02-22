@@ -2,7 +2,6 @@
 
 namespace App\Command\Twilio;
 
-use App\Entity\Twilio\TwilioCall;
 use App\Entity\Twilio\TwilioMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -28,17 +27,12 @@ class TwilioCleanCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $cutoff = new \DateTime('-30 days');
 
-        $calls = $this->entityManager->createQuery(
-            'DELETE FROM ' . TwilioCall::class . ' c WHERE c.createdAt < :cutoff'
-        )->setParameter('cutoff', $cutoff)->execute();
-
         $messages = $this->entityManager->createQuery(
             'DELETE FROM ' . TwilioMessage::class . ' m WHERE m.createdAt < :cutoff'
         )->setParameter('cutoff', $cutoff)->execute();
 
         $io->success(sprintf(
-            'Deleted %d call(s), %d message(s).',
-            $calls,
+            'Deleted %d message(s).',
             $messages,
         ));
 

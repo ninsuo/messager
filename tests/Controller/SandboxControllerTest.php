@@ -2,7 +2,6 @@
 
 namespace App\Tests\Controller;
 
-use App\Entity\Fake\FakeCall;
 use App\Repository\Fake\FakeCallRepository;
 use App\Repository\Fake\FakeSmsRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -65,31 +64,5 @@ class SandboxControllerTest extends WebTestCase
         $pageText = $crawler->text();
         $this->assertStringContainsString('+33612345678', $pageText);
         $this->assertStringContainsString('Bonjour', $pageText);
-    }
-
-    public function testKeyPressCreatesNewRecord(): void
-    {
-        $client = static::createClient();
-
-        $fakeCallRepository = self::getContainer()->get(FakeCallRepository::class);
-        $call = $fakeCallRepository->findOneBy([
-            'toNumber' => '+33698765432',
-            'type' => FakeCall::TYPE_ESTABLISH,
-        ]);
-        $this->assertNotNull($call);
-
-        $countBefore = count($fakeCallRepository->findAll());
-
-        $client->request('POST', '/sandbox/calls/' . $call->getId() . '/key-press', [
-            'digit' => '5',
-        ]);
-
-        $this->assertResponseRedirects('/sandbox/calls');
-
-        $countAfter = count($fakeCallRepository->findAll());
-        $this->assertSame($countBefore + 1, $countAfter);
-
-        $newCall = $fakeCallRepository->findOneBy([], ['id' => 'DESC']);
-        $this->assertSame(FakeCall::TYPE_KEY_PRESS, $newCall->getType());
     }
 }

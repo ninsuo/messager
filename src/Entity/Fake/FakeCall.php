@@ -10,7 +10,6 @@ use Doctrine\ORM\Mapping as ORM;
 class FakeCall
 {
     public const TYPE_ESTABLISH = 'establish';
-    public const TYPE_KEY_PRESS = 'key_press';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

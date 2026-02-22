@@ -19,11 +19,7 @@
                     {% for call in calls %}
                         <div class="sandbox-call-card">
                             <div class="d-flex align-items-start gap-2 mb-2">
-                                {% if call.type == 'establish' %}
-                                    <span class="badge bg-primary trigger-badge">Appel</span>
-                                {% else %}
-                                    <span class="badge bg-warning text-dark trigger-badge">Touche</span>
-                                {% endif %}
+                                <span class="badge bg-primary trigger-badge">Appel</span>
                                 <div class="flex-grow-1">
                                     <div class="trigger-content">
                                         <strong>{{ call.fromNumber }}</strong> &rarr; <strong>{{ call.toNumber }}</strong>
@@ -36,17 +32,6 @@
                                     <div class="trigger-meta mt-1">{{ call.createdAt|date('d/m/Y H:i:s') }}</div>
                                 </div>
                             </div>
-
-                            {% if latestIds[call.toNumber] is defined and latestIds[call.toNumber] == call.id %}
-                                <div class="sandbox-keypad">
-                                    {% for digit in 0..9 %}
-                                        <form method="post" action="{{ path('sandbox_call_key_press', {id: call.id}) }}">
-                                            <input type="hidden" name="digit" value="{{ digit }}">
-                                            <button type="submit" class="sandbox-key-btn">{{ digit }}</button>
-                                        </form>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
                         </div>
                     {% endfor %}
                 </div>

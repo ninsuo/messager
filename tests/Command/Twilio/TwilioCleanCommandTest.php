@@ -2,9 +2,7 @@
 
 namespace App\Tests\Command\Twilio;
 
-use App\Entity\Twilio\TwilioCall;
 use App\Entity\Twilio\TwilioMessage;
-use App\Repository\Twilio\TwilioCallRepository;
 use App\Repository\Twilio\TwilioMessageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -29,21 +27,13 @@ class TwilioCleanCommandTest extends KernelTestCase
 
     public function testDeletesOldEntitiesAndKeepsRecent(): void
     {
-        $oldCall = $this->createCall(new \DateTime('-31 days'));
-        $recentCall = $this->createCall(new \DateTime('-5 days'));
-
         $oldMessage = $this->createMessage(new \DateTime('-31 days'));
         $recentMessage = $this->createMessage(new \DateTime('-5 days'));
 
         $this->tester->execute([]);
 
         $this->assertSame(0, $this->tester->getStatusCode());
-        $this->assertStringContainsString('1 call(s)', $this->tester->getDisplay());
         $this->assertStringContainsString('1 message(s)', $this->tester->getDisplay());
-
-        $callRepo = self::getContainer()->get(TwilioCallRepository::class);
-        $this->assertNull($callRepo->findOneBy(['uuid' => $oldCall->getUuid()]));
-        $this->assertNotNull($callRepo->findOneBy(['uuid' => $recentCall->getUuid()]));
 
         $messageRepo = self::getContainer()->get(TwilioMessageRepository::class);
         $this->assertNull($messageRepo->findOneBy(['uuid' => $oldMessage->getUuid()]));
@@ -55,26 +45,7 @@ class TwilioCleanCommandTest extends KernelTestCase
         $this->tester->execute([]);
 
         $this->assertSame(0, $this->tester->getStatusCode());
-        $this->assertStringContainsString('0 call(s)', $this->tester->getDisplay());
         $this->assertStringContainsString('0 message(s)', $this->tester->getDisplay());
-    }
-
-    private function createCall(\DateTime $createdAt): TwilioCall
-    {
-        $call = new TwilioCall();
-        $call->setUuid(Uuid::v4()->toRfc4122());
-        $call->setDirection(TwilioCall::DIRECTION_OUTBOUND);
-        $call->setFromNumber('+33700000000');
-        $call->setToNumber('+33600000000');
-
-        $this->em->persist($call);
-        $this->em->flush();
-
-        // Override createdAt after PrePersist callback
-        $call->setCreatedAt($createdAt);
-        $this->em->flush();
-
-        return $call;
     }
 
     private function createMessage(\DateTime $createdAt): TwilioMessage
@@ -94,5 +65,4 @@ class TwilioCleanCommandTest extends KernelTestCase
 
         return $message;
     }
-
 }

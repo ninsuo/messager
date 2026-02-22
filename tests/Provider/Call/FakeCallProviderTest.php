@@ -2,7 +2,6 @@
 
 namespace App\Tests\Provider\Call;
 
-use App\Entity\Fake\FakeCall;
 use App\Provider\Call\CallProvider;
 use App\Provider\Call\FakeCallProvider;
 use App\Repository\Fake\FakeCallRepository;
@@ -27,28 +26,13 @@ class FakeCallProviderTest extends KernelTestCase
     {
         $all = $this->repository->findAll();
 
-        $this->assertCount(3, $all);
-    }
-
-    public function testFixtureEstablishType(): void
-    {
-        $established = $this->repository->findBy(['type' => FakeCall::TYPE_ESTABLISH]);
-
-        $this->assertCount(2, $established);
-    }
-
-    public function testFixtureKeyPressType(): void
-    {
-        $keyPresses = $this->repository->findBy(['type' => FakeCall::TYPE_KEY_PRESS]);
-
-        $this->assertCount(1, $keyPresses);
+        $this->assertGreaterThanOrEqual(2, count($all));
     }
 
     public function testFixtureContent(): void
     {
         $call = $this->repository->findOneBy([
             'toNumber' => '+33698765432',
-            'type' => FakeCall::TYPE_ESTABLISH,
         ]);
 
         $this->assertNotNull($call);
@@ -60,7 +44,6 @@ class FakeCallProviderTest extends KernelTestCase
     {
         $call = $this->repository->findOneBy([
             'toNumber' => '+33611223344',
-            'type' => FakeCall::TYPE_ESTABLISH,
         ]);
 
         $this->assertNotNull($call);
@@ -87,41 +70,38 @@ class FakeCallProviderTest extends KernelTestCase
 
     public function testSendStoresCorrectData(): void
     {
-        $this->provider->send('+33611111111');
+        $this->provider->send('+33611111111', [], 'Test content');
 
         $call = $this->repository->findOneBy([
             'toNumber' => '+33611111111',
         ]);
 
         $this->assertNotNull($call);
-        $this->assertSame(FakeCall::TYPE_ESTABLISH, $call->getType());
         $this->assertNotNull($call->getId());
         $this->assertInstanceOf(\DateTime::class, $call->getCreatedAt());
+        $this->assertNotNull($call->getContent());
+        $this->assertStringContainsString('Test content', $call->getContent());
     }
 
-    public function testTriggerHookStoresCorrectType(): void
+    public function testSendWithAuthCodeBuildsCorrectTwiml(): void
     {
-        $fakeCall = $this->provider->triggerHook(
-            '+33600000000',
-            '+33611111111',
-            [],
-            'test.event',
-            FakeCall::TYPE_KEY_PRESS,
-            '5',
-        );
+        $this->provider->send('+33622222222', ['auth_code' => '123 456']);
 
-        $this->assertSame(FakeCall::TYPE_KEY_PRESS, $fakeCall->getType());
-        $this->assertSame('+33600000000', $fakeCall->getFromNumber());
-        $this->assertSame('+33611111111', $fakeCall->getToNumber());
-        $this->assertNotNull($fakeCall->getId());
+        $call = $this->repository->findOneBy([
+            'toNumber' => '+33622222222',
+        ]);
+
+        $this->assertNotNull($call);
+        $this->assertStringContainsString('1, 2, 3, 4, 5, 6', $call->getContent());
+        $this->assertStringContainsString('Votre code Messager est', $call->getContent());
     }
 
     public function testSendMultiple(): void
     {
         $this->provider->send('+33611111111');
-        $this->provider->send('+33622222222');
+        $this->provider->send('+33633333333');
 
-        $calls = $this->repository->findBy(['toNumber' => '+33622222222']);
+        $calls = $this->repository->findBy(['toNumber' => '+33633333333']);
 
         $this->assertCount(1, $calls);
     }
